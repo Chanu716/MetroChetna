@@ -9,11 +9,12 @@
         /* Dynamic Section Styles */
         .form-section {
             display: none;
-            background-color: #262626;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
             margin-top: 30px;
             padding: 30px 40px;
-            border-radius: 4px;
-            border: 2px solid #393939;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            box-shadow: 0 4px 16px rgba(92, 107, 192, 0.1);
             animation: slideDown 0.3s ease-in-out;
         }
         
@@ -39,17 +40,18 @@
         }
         
         .close-section {
-            color: #aaa;
+            color: #6c757d;
             font-size: 24px;
             font-weight: bold;
             cursor: pointer;
             line-height: 1;
             padding: 5px;
             margin-right: 10px;
+            transition: color 0.3s ease;
         }
         
         .close-section:hover {
-            color: #f4f4f4;
+            color: #5c6bc0;
         }
         
         /* Center single button */
@@ -61,24 +63,26 @@
         textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid #525252;
-            background-color: #393939;
-            color: #f4f4f4;
-            border-radius: 0;
+            border: 2px solid #e9ecef;
+            background-color: #ffffff;
+            color: #1a237e;
+            border-radius: 8px;
             box-sizing: border-box;
             font-size: 1em;
             font-family: 'IBM Plex Sans', sans-serif;
             min-height: 120px;
             resize: vertical;
+            transition: all 0.3s ease;
         }
         
         textarea:focus {
-            border-color: #0f62fe;
+            border-color: #5c6bc0;
             outline: none;
+            box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.1);
         }
         
         textarea::placeholder {
-            color: #8d8d8d;
+            color: #6c757d;
         }
         
         .action-buttons {
@@ -89,37 +93,53 @@
         }
         
         .action-card {
-            background: #393939;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
             padding: 40px 20px;
-            border-radius: 4px;
+            border-radius: 12px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid #525252;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #e9ecef;
+            box-shadow: 0 4px 12px rgba(92, 107, 192, 0.1);
         }
         
         .action-card:hover {
-            background: #525252;
-            border-color: #0f62fe;
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, #5c6bc0 0%, #7986cb 100%);
+            border-color: #5c6bc0;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(92, 107, 192, 0.2);
         }
         
         .action-card h3 {
             margin-bottom: 15px;
-            color: #f4f4f4;
+            color: #1a237e;
             font-size: 1.3em;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .action-card:hover h3 {
+            color: #ffffff;
         }
         
         .action-card p {
-            color: #b0b0b0;
+            color: #6c757d;
             margin: 0;
+            transition: color 0.3s ease;
+        }
+        
+        .action-card:hover p {
+            color: #ffffff;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Job Card Management</h1>
+    <div class="page-header">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'">←</button>
+        <h1>Job Card Management</h1>
+    </div>
     
     <div class="action-buttons">
         <div class="action-card" onclick="showOpenNewCard()">

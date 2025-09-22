@@ -222,34 +222,49 @@ textarea::placeholder {
 }
 
 /* Back Button Styles */
-.back-button {
-    position: absolute;
-    top: 20px;
-    left: 20px;
+.back-button, .back-btn {
     background: linear-gradient(135deg, #5c6bc0 0%, #7986cb 100%);
     color: white;
     border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 18px;
+    font-weight: 600;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(92, 107, 192, 0.3);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    z-index: 100;
+    margin-bottom: 20px;
+    margin-right: 20px;
 }
 
-.back-button:hover {
+.back-button:hover, .back-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(92, 107, 192, 0.4);
     background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
 }
 
-.back-button:active {
+.back-button:active, .back-btn:active {
     transform: translateY(0);
+}
+
+/* Header layout with back button and title */
+.page-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.page-header .back-btn {
+    margin-bottom: 0;
+    margin-right: 20px;
+}
+
+.page-header h1 {
+    margin: 0;
+    flex: 1;
 }
 
 /* Button Styles */
