@@ -1,0 +1,28 @@
+{
+  "name": "railway-maximo-clone",
+  "version": "1.0.0",
+  "description": "Railway Train Management System - IBM Maximo Clone",
+  "main": "server-service-account.js",
+  "scripts": {
+    "start": "node server-service-account.js",
+    "dev": "nodemon server-service-account.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "googleapis": "^126.0.1",
+    "google-auth-library": "^9.2.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "railway",
+    "maximo",
+    "train",
+    "management",
+    "google-sheets"
+  ],
+  "author": "SIH 2025 Team",
+  "license": "MIT"
+}

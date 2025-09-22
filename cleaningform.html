@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cleaning & Detailing</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">←</button>
+    <h1>Confirm Cleaning & Detailing</h1>
+    <form id="cleaningForm">
+        <div class="form-group">
+            <label for="trainID">Train ID</label>
+            <select id="trainID" name="trainID">
+                <option value="" disabled selected>Select a Train ID</option>
+                <option value="T001">T001</option><option value="T002">T002</option><option value="T003">T003</option><option value="T004">T004</option><option value="T005">T005</option><option value="T006">T006</option><option value="T007">T007</option><option value="T008">T008</option><option value="T009">T009</option><option value="T010">T010</option><option value="T011">T011</option><option value="T012">T012</option><option value="T013">T013</option><option value="T014">T014</option><option value="T015">T015</option><option value="T016">T016</option><option value="T017">T017</option><option value="T018">T018</option><option value="T019">T019</option><option value="T020">T020</option><option value="T021">T021</option><option value="T022">T022</option><option value="T023">T023</option><option value="T024">T024</option><option value="T025">T025</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" id="date" name="date" required>
+        </div>
+        <div class="form-group">
+            <label for="slot">Cleaning Slot</label>
+            <select id="slot" name="slot">
+                <option value="Slot 1 (21:00 - 23:00)">Slot 1 (21:00 - 23:00)</option>
+                <option value="Slot 2 (23:00 - 01:00)">Slot 2 (23:00 - 01:00)</option>
+                <option value="Slot 3 (01:00 - 03:00)">Slot 3 (01:00 - 03:00)</option>
+            </select>
+        </div>
+        <div class="button-container">
+            <button type="submit" class="submit-btn">Confirm Slot</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const form = document.getElementById('cleaningForm');
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        alert(`Cleaning slot for ${document.getElementById('trainID').value} on ${document.getElementById('date').value} confirmed.`);
+    });
+</script>
+
+</body>
+</html>

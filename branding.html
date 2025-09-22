@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Branding Priorities</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<button class="back-btn" onclick="window.location.href='dashboard.html'" title="Back to Dashboard">
+    ←
+</button>
+
+<div class="container">
+    <h1>Update Branding Exposure</h1>
+    <form id="brandingForm">
+        <div class="form-group">
+            <label for="trainID">Train ID</label>
+            <select id="trainID" name="trainID">
+                <option value="" disabled selected>Select a Train ID</option>
+                <option value="T005">T005</option>
+                <option value="T012">T012</option>
+                <option value="T020">T020</option>
+            </select>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="campaignID">Campaign ID</label>
+                <input type="text" id="campaignID" name="campaignID" readonly>
+            </div>
+            <div class="form-group">
+                <label for="advertiserID">Advertiser ID</label>
+                <input type="text" id="advertiserID" name="advertiserID" readonly>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="campaignName">Campaign Name</label>
+            <input type="text" id="campaignName" name="campaignName" readonly>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="requiredHours">Required Hours</label>
+                <input type="text" id="requiredHours" name="requiredHours" readonly>
+            </div>
+            <div class="form-group">
+                <label for="accumulatedHours">Total Accumulated Hours</label>
+                <input type="text" id="accumulatedHours" name="accumulatedHours" readonly>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="dailyHours">Hours Run Today</label>
+                <input type="number" id="dailyHours" name="dailyHours" value="0" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="overHours">Over Hours</label>
+                <input type="text" id="overHours" name="overHours" readonly>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="penalty">Penalty Per Day</label>
+            <input type="text" id="penalty" name="penalty" readonly>
+        </div>
+        
+        <div class="button-container">
+            <button type="submit" class="submit-btn">Update Hours</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const brandingData = {
+        'T005': { campaignID: 'CAMP001', advertiserID: 'ADV01', campaignName: 'Summer Bonanza', requiredHours: 800, accumulatedHours: 300, penalty: 1000 },
+        'T012': { campaignID: 'CAMP001', advertiserID: 'ADV01', campaignName: 'Summer Bonanza', requiredHours: 800, accumulatedHours: 250, penalty: 1000 },
+        'T020': { campaignID: 'CAMP001', advertiserID: 'ADV01', campaignName: 'Summer Bonanza', requiredHours: 800, accumulatedHours: 50, penalty: 1000 }
+    };
+
+    const form = document.getElementById('brandingForm');
+    const trainIDSelect = document.getElementById('trainID');
+    const campaignIDInput = document.getElementById('campaignID');
+    const advertiserIDInput = document.getElementById('advertiserID');
+    const campaignNameInput = document.getElementById('campaignName');
+    const requiredHoursInput = document.getElementById('requiredHours');
+    const accumulatedHoursInput = document.getElementById('accumulatedHours');
+    const dailyHoursInput = document.getElementById('dailyHours');
+    const overHoursInput = document.getElementById('overHours');
+    const penaltyInput = document.getElementById('penalty');
+
+    function updateOverHours() {
+        const required = parseInt(requiredHoursInput.value, 10);
+        const accumulated = parseInt(accumulatedHoursInput.value, 10);
+        const over = Math.max(0, accumulated - required);
+        overHoursInput.value = over;
+    }
+
+    trainIDSelect.addEventListener('change', () => {
+        const selectedTrainID = trainIDSelect.value;
+        const data = brandingData[selectedTrainID];
+        if (data) {
+            campaignIDInput.value = data.campaignID;
+            advertiserIDInput.value = data.advertiserID;
+            campaignNameInput.value = data.campaignName;
+            requiredHoursInput.value = data.requiredHours;
+            accumulatedHoursInput.value = data.accumulatedHours;
+            penaltyInput.value = data.penalty;
+            updateOverHours();
+        }
+    });
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        
+        const trainID = trainIDSelect.value;
+        const existingHours = parseInt(accumulatedHoursInput.value, 10);
+        const dailyHours = parseInt(dailyHoursInput.value, 10);
+        const totalHours = existingHours + dailyHours;
+        const required = parseInt(requiredHoursInput.value, 10);
+        
+        // Prepare data for Google Sheets
+        const brandingData = {
+            Campaign_ID: campaignIDInput.value,
+            Train_ID: trainID,
+            Advertiser_ID: advertiserIDInput.value,
+            Campaign_Name: campaignNameInput.value,
+            Start_Date: new Date().toISOString().split('T')[0], // Current date
+            End_Date: new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0], // 30 days later
+            Required_Exposure_Hours: required.toString(),
+            Accumulated_Exposure_Hours: totalHours.toString(),
+            Penalty_Per_Day: penaltyInput.value,
+            Remaining_Hours: Math.max(0, required - totalHours).toString()
+        };
+        
+        try {
+            // Save to Google Sheets
+            await railwayAPI.saveBrandingData(brandingData);
+            railwayAPI.showMessage(`Branding updated successfully! New total hours for ${trainID}: ${totalHours}.`);
+            
+            // Update the form display
+            accumulatedHoursInput.value = totalHours;
+            updateOverHours();
+            dailyHoursInput.value = '';
+            
+        } catch (error) {
+            railwayAPI.showMessage(`Error updating branding: ${error.message}`, 'error');
+        }
+    });
+</script>
+
+<!-- Include the Railway API -->
+<script src="railway-api.js"></script>
+
+</body>
+</html>

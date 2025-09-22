@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Certificates</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">←</button>
+    <h1>Update Fitness Certificate</h1>
+    <form id="fitnessForm">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="recordID">Record ID</label>
+                <input type="text" id="recordID" name="recordID" readonly>
+            </div>
+            <div class="form-group">
+                <label for="trainID">Train ID</label>
+                <select id="trainID" name="trainID">
+                    <option value="" disabled selected>Select a Train ID</option>
+                    <option value="T001">T001</option><option value="T002">T002</option><option value="T003">T003</option><option value="T004">T004</option><option value="T005">T005</option><option value="T006">T006</option><option value="T007">T007</option><option value="T008">T008</option><option value="T009">T009</option><option value="T010">T010</option><option value="T011">T011</option><option value="T012">T012</option><option value="T013">T013</option><option value="T014">T014</option><option value="T015">T015</option><option value="T016">T016</option><option value="T017">T017</option><option value="T018">T018</option><option value="T019">T019</option><option value="T020">T020</option><option value="T021">T021</option><option value="T022">T022</option><option value="T023">T023</option><option value="T024">T024</option><option value="T025">T025</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="certificateType">Certificate Type</label>
+                <select id="certificateType" name="certificateType">
+                    <option value="RollingStock">Rolling Stock</option>
+                    <option value="Signalling">Signalling</option>
+                    <option value="Telecom">Telecom</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="Valid">Valid</option>
+                    <option value="Pending">Awaiting Approval</option>
+                    <option value="Expired">Expired</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="issuedDate">Issued Date</label>
+                <input type="date" id="issuedDate" name="issuedDate" required>
+                <span id="issuedDateError" class="error"></span>
+            </div>
+            <div class="form-group">
+                <label for="expiryDate">Expiry Date</label>
+                <input type="date" id="expiryDate" name="expiryDate" required>
+                <span id="expiryDateError" class="error"></span>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="remarks">Remarks</label>
+            <input type="text" id="remarks" name="remarks">
+        </div>
+        
+        <div class="button-container">
+            <button type="submit" class="submit-btn">Submit</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const form = document.getElementById('fitnessForm');
+    const recordIDInput = document.getElementById('recordID');
+    const issuedDateInput = document.getElementById('issuedDate');
+    const expiryDateInput = document.getElementById('expiryDate');
+    const issuedDateError = document.getElementById('issuedDateError');
+    const expiryDateError = document.getElementById('expiryDateError');
+    const lastRecordID = 62; // From fitness_certificates.csv
+
+    recordIDInput.value = lastRecordID + 1;
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        issuedDateError.textContent = '';
+        expiryDateError.textContent = '';
+        let isValid = true;
+
+        const issuedDate = new Date(issuedDateInput.value);
+        const expiryDate = new Date(expiryDateInput.value);
+        
+        if (issuedDate >= expiryDate) {
+            expiryDateError.textContent = 'Expiry Date must be after Issued Date.';
+            isValid = false;
+        }
+
+        if (isValid) {
+            // Prepare data for Google Sheets
+            const fitnessData = {
+                Record_ID: recordIDInput.value,
+                Train_ID: document.getElementById('trainID').value,
+                Certificate_Type: document.getElementById('certificateType').value,
+                Issued_Date: document.getElementById('issuedDate').value,
+                Expiry_Date: document.getElementById('expiryDate').value,
+                Status: document.getElementById('status').value,
+                Remarks: document.getElementById('remarks').value || 'Certificate updated'
+            };
+            
+            try {
+                // Save to Google Sheets
+                await railwayAPI.saveFitnessData(fitnessData);
+                railwayAPI.showMessage('Fitness Certificate updated successfully!');
+                
+                // Reset form and increment record ID
+                form.reset();
+                recordIDInput.value = parseInt(recordIDInput.value) + 1;
+                
+            } catch (error) {
+                railwayAPI.showMessage(`Error updating fitness certificate: ${error.message}`, 'error');
+            }
+        }
+    });
+</script>
+
+<!-- Include the Railway API -->
+<script src="railway-api.js"></script>
+
+</body>
+</html>
