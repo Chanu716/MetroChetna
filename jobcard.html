@@ -1,5 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYP        /* Dynamic Section Styles */
+        .form-section {
+            display: none;
+            background: transparent;
+            margin-top: 30px;
+            padding: 20px 0;
+            animation: slideDown 0.3s ease-in-out;
+        }tml lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,12 +15,11 @@
         /* Dynamic Section Styles */
         .form-section {
             display: none;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            background: rgba(248, 249, 250, 0.8);
             margin-top: 30px;
             padding: 30px 40px;
             border-radius: 8px;
-            border: 2px solid #e9ecef;
-            box-shadow: 0 4px 16px rgba(92, 107, 192, 0.1);
+            border: 1px solid rgba(233, 236, 239, 0.5);
             animation: slideDown 0.3s ease-in-out;
         }
         
@@ -78,7 +83,6 @@
         textarea:focus {
             border-color: #5c6bc0;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.1);
         }
         
         textarea::placeholder {
@@ -93,21 +97,19 @@
         }
         
         .action-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            background: transparent;
             padding: 40px 20px;
             border-radius: 12px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid #e9ecef;
-            box-shadow: 0 4px 12px rgba(92, 107, 192, 0.1);
+            border: 2px solid #5c6bc0;
         }
         
         .action-card:hover {
             background: linear-gradient(135deg, #5c6bc0 0%, #7986cb 100%);
-            border-color: #5c6bc0;
+            border-color: #3f51b5;
             transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(92, 107, 192, 0.2);
         }
         
         .action-card h3 {

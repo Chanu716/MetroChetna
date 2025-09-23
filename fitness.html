@@ -9,12 +9,9 @@
         /* Dynamic Section Styles */
         .form-section {
             display: none;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            background: transparent;
             margin-top: 30px;
-            padding: 30px 40px;
-            border-radius: 12px;
-            border: 2px solid #e9ecef;
-            box-shadow: 0 4px 16px rgba(92, 107, 192, 0.1);
+            padding: 20px 0;
             animation: slideDown 0.3s ease-in-out;
         }
         
@@ -87,7 +84,7 @@
             left: 0;
             height: 20px;
             width: 20px;
-            background-color: #ffffff;
+            background-color: #f8f9fa;
             border: 2px solid #e9ecef;
             border-radius: 4px;
         }
@@ -135,7 +132,7 @@
         }
 
         .overlay-content {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             margin: 15% auto;
             padding: 40px;
             border-radius: 12px;
@@ -197,7 +194,6 @@
             <button type="button" id="checkStatusBtn" class="submit-btn" disabled>Check Status</button>
         </div>
     </form>
-</div>
 
     <!-- Dynamic Status Sections -->
     <!-- Valid Status Section -->
@@ -216,10 +212,9 @@
                 <input type="date" id="displayExpiryDate" readonly>
             </div>
         </div>
-    </div>
 
-    <!-- Expired Status Section -->
-    <div id="expiredSection" class="form-section">
+        <!-- Expired Status Section -->
+        <div id="expiredSection" class="form-section">
         <div class="section-header">
             <span class="close-section" onclick="hideSection('expiredSection')">&times;</span>
         </div>
@@ -251,10 +246,10 @@
         <div class="button-container">
             <button type="button" id="saveExpiredBtn" class="submit-btn">Save Renewal</button>
         </div>
-    </div>
+        </div>
 
-    <!-- Awaiting Approval Section -->
-    <div id="awaitingSection" class="form-section">
+        <!-- Awaiting Approval Section -->
+        <div id="awaitingSection" class="form-section">
         <div class="section-header">
             <span class="close-section" onclick="hideSection('awaitingSection')">&times;</span>
         </div>
@@ -282,6 +277,7 @@
         <div class="button-container" id="deliveryButtonContainer" style="display: none;">
             <button type="button" id="markDeliveredBtn" class="submit-btn">Confirm Delivery</button>
         </div>
+        </div>
     </div>
 
     <!-- Success Message Overlay -->
@@ -303,6 +299,36 @@
     const checkStatusBtn = document.getElementById('checkStatusBtn');
     
     let currentRecord = null;
+
+    // Helper function to format dates for HTML date inputs (YYYY-MM-DD)
+    function formatDateForInput(dateStr) {
+        if (!dateStr || dateStr === '') return '';
+        
+        // If already in YYYY-MM-DD format, return as is
+        if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            return dateStr;
+        }
+        
+        // Handle M/D/YYYY format (e.g., "1/12/2023")
+        if (dateStr.includes('/')) {
+            const [month, day, year] = dateStr.split('/');
+            const paddedMonth = month.padStart(2, '0');
+            const paddedDay = day.padStart(2, '0');
+            return `${year}-${paddedMonth}-${paddedDay}`;
+        }
+        
+        // Handle other formats or return empty if can't parse
+        try {
+            const date = new Date(dateStr);
+            if (!isNaN(date.getTime())) {
+                return date.toISOString().split('T')[0];
+            }
+        } catch (e) {
+            console.warn('Could not parse date:', dateStr);
+        }
+        
+        return '';
+    }
 
     // Enable check status button when both selections are made
     function checkFormValidity() {
@@ -350,7 +376,7 @@
                     Status: 'Expired',
                     Issued_Date: '',
                     Expiry_Date: '',
-                    Expected_Delivery_Date: ''
+                    'Expected_Date_Of_Delivery(EDD)': ''
                 };
                 currentRecord = newRecord;
                 showStatusSection('Expired', newRecord);
@@ -402,9 +428,9 @@
     function showValidSection(record) {
         const section = document.getElementById('validSection');
         
-        // Populate fields
-        document.getElementById('displayIssuedDate').value = record.Issued_Date;
-        document.getElementById('displayExpiryDate').value = record.Expiry_Date;
+        // Populate fields - convert dates to proper format for date inputs
+        document.getElementById('displayIssuedDate').value = formatDateForInput(record.Issued_Date);
+        document.getElementById('displayExpiryDate').value = formatDateForInput(record.Expiry_Date);
         
         // Show section
         section.style.display = 'block';
@@ -415,9 +441,9 @@
     function showExpiredSection(record) {
         const section = document.getElementById('expiredSection');
         
-        // Populate old dates (if they exist)
-        document.getElementById('oldIssuedDate').value = record.Issued_Date || '';
-        document.getElementById('oldExpiryDate').value = record.Expiry_Date || '';
+        // Populate old dates (if they exist) - convert to proper format for date inputs
+        document.getElementById('oldIssuedDate').value = formatDateForInput(record.Issued_Date) || '';
+        document.getElementById('oldExpiryDate').value = formatDateForInput(record.Expiry_Date) || '';
         
         // Clear new date fields
         document.getElementById('newIssuedDate').value = '';
@@ -436,10 +462,10 @@
     function showAwaitingSection(record) {
         const section = document.getElementById('awaitingSection');
         
-        // Populate fields
-        document.getElementById('pendingIssuedDate').value = record.Issued_Date;
-        document.getElementById('pendingExpiryDate').value = record.Expiry_Date;
-        document.getElementById('pendingDeliveryDate').value = record.Expected_Delivery_Date;
+        // Populate fields - convert dates to proper format for date inputs
+        document.getElementById('pendingIssuedDate').value = formatDateForInput(record.Issued_Date);
+        document.getElementById('pendingExpiryDate').value = formatDateForInput(record.Expiry_Date);
+        document.getElementById('pendingDeliveryDate').value = formatDateForInput(record['Expected_Date_Of_Delivery(EDD)']);
         
         // Reset checkbox
         const checkbox = document.getElementById('deliveredCheckbox');
@@ -483,7 +509,7 @@
                 Certificate_Type: currentRecord.Certificate_Type,
                 Issued_Date: newIssuedDate,
                 Expiry_Date: newExpiryDate,
-                Expected_Delivery_Date: expectedDeliveryDate,
+                'Expected_Date_Of_Delivery(EDD)': expectedDeliveryDate,
                 Status: 'Awaiting Approval',
                 Remarks: 'Certificate renewed - awaiting approval'
             };
@@ -504,7 +530,7 @@
                 Certificate_Type: currentRecord.Certificate_Type,
                 Issued_Date: currentRecord.Issued_Date,
                 Expiry_Date: currentRecord.Expiry_Date,
-                Expected_Delivery_Date: '', // Clear expected delivery date
+                'Expected_Date_Of_Delivery(EDD)': '', // Clear expected delivery date
                 Status: 'Valid',
                 Remarks: 'Certificate delivered and activated'
             };

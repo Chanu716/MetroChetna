@@ -132,11 +132,8 @@ body {
 .container {
     max-width: 900px;
     margin: auto;
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    padding: 40px 50px;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(52, 58, 64, 0.12);
-    border: 1px solid #e9ecef;
+    background: transparent;
+    padding: 20px;
 }
 
 .container h1 {
@@ -167,7 +164,7 @@ body {
     width: 100%;
     padding: 14px 16px;
     border: 2px solid #dee2e6;
-    background-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.8);
     color: #212529;
     border-radius: 8px;
     box-sizing: border-box;
@@ -182,7 +179,7 @@ body {
 }
 
 .form-group input:read-only {
-    background-color: #f8f9fa;
+    background-color: rgba(248, 249, 250, 0.7);
     color: #6c757d;
 }
 
@@ -191,7 +188,7 @@ textarea {
     width: 100%;
     padding: 14px 16px;
     border: 2px solid #dee2e6;
-    background-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.8);
     color: #212529;
     border-radius: 8px;
     box-sizing: border-box;
