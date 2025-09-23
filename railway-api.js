@@ -141,6 +141,37 @@ class RailwayMaximoAPI {
         return await this.getData('job_cards');
     }
 
+    // Update existing job card data (for closing job cards)
+    async updateJobCardData(jobCardId, updatedData) {
+        if (!this.isServerAvailable) {
+            throw new Error('Server not available. Please start the server with: npm start');
+        }
+
+        try {
+            const response = await fetch(`${this.serverURL}/data/job_cards`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    JobCard_ID: jobCardId,
+                    ...updatedData
+                })
+            });
+
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to update job card');
+            }
+            
+            return result;
+        } catch (error) {
+            console.error('Error updating job card:', error);
+            throw error;
+        }
+    }
+
     async getTrainData() {
         return await this.getData('train_master');
     }
@@ -166,7 +197,53 @@ class RailwayMaximoAPI {
             document.body.removeChild(messageDiv);
         }, 3000);
     }
+
+    // Fitness Certificate specific methods
+    async getFitnessRecord(trainID, certificateType) {
+        try {
+            const fitnessData = await this.getData('fitness_certificates');
+            
+            // Find record matching Train ID and Certificate Type
+            const record = fitnessData.find(row => 
+                row.Train_ID === trainID && row.Certificate_Type === certificateType
+            );
+            
+            return record || null;
+        } catch (error) {
+            console.error('Error fetching fitness record:', error);
+            throw error;
+        }
+    }
+
+    async saveFitnessData(data) {
+        try {
+            // Use PUT endpoint to handle both updates and new records
+            const response = await fetch(`${this.serverURL}/data/fitness_certificates`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to save fitness data');
+            }
+            
+            return result;
+        } catch (error) {
+            console.error('Error saving fitness data:', error);
+            throw error;
+        }
+    }
 }
 
 // Create global instance
 const railwayAPI = new RailwayMaximoAPI();
+
+// Also make it available on window object for compatibility
+if (typeof window !== 'undefined') {
+    window.railwayAPI = railwayAPI;
+}

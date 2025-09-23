@@ -163,7 +163,7 @@ function getKeyColumn(sheetName) {
     'fitness_certificates': 'Record_ID',
     'job_cards': 'JobCard_ID',
     'mileage': 'Train_ID',
-    'stabling_geometry_actual': 'From_Bay' // Or composite key logic
+    'stabling_geometry': 'From_Bay' // Or composite key logic
   };
   
   return keyColumns[sheetName] || 'ID';
@@ -267,7 +267,7 @@ function initializeSheets() {
     'fitness_certificates': ['Record_ID', 'Train_ID', 'Certificate_Type', 'Issued_Date', 'Expiry_Date', 'Status', 'Remarks'],
     'job_cards': ['JobCard_ID', 'Train_ID', 'Task_Description', 'Opened_Date', 'Due_Date', 'Closed_Date', 'Status'],
     'mileage': ['Train_ID', 'Total_KM', 'KM_Since_Last_A', 'KM_Since_Last_B', 'KM_Since_Last_C', 'KM_Since_Last_D', 'Last_Service_Date', 'Daily_Avg_KM'],
-    'stabling_geometry_actual': ['Depot', 'From_Bay', 'To_Bay', 'From_Index', 'To_Index', 'Shunting_Time_Minutes', 'Energy_Cost_kWh', 'Safety_Risk_Score']
+    'stabling_geometry': ['Depot', 'From_Bay', 'To_Bay', 'From_Index', 'To_Index', 'Shunting_Time_Minutes', 'Energy_Cost_kWh', 'Risk_Score']
   };
   
   Object.keys(sheetConfigs).forEach(sheetName => {

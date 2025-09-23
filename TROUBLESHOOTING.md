@@ -20,7 +20,7 @@ Your Google Sheet needs these exact tab names:
 - `fitness_certificates`
 - `job_cards`
 - `mileage`
-- `stabling_geometry_actual`
+- `stabling_geometry`
 
 **Solution:**
 1. In your Google Sheet, right-click on the sheet tab at bottom

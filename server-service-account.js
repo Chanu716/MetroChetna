@@ -111,6 +111,151 @@ app.post('/api/data/:sheetName', async (req, res) => {
   }
 });
 
+// API endpoint to update existing data
+app.put('/api/data/:sheetName', async (req, res) => {
+  try {
+    const sheetName = req.params.sheetName;
+    const data = req.body;
+    console.log(`Attempting to update data in sheet: ${sheetName}`, data);
+    
+    // Get all data from the sheet
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: sheetName,
+    });
+    
+    if (!response.data.values || response.data.values.length === 0) {
+      throw new Error(`Sheet "${sheetName}" not found or is empty`);
+    }
+    
+    const rows = response.data.values;
+    const headers = rows[0];
+    
+    // Find the row to update based on Record_ID or unique combination
+    let rowIndex = -1;
+    
+    if (data.Record_ID) {
+      // Find by Record_ID
+      rowIndex = rows.findIndex((row, index) => {
+        if (index === 0) return false; // Skip header row
+        const recordId = row[headers.indexOf('Record_ID')];
+        return recordId === data.Record_ID.toString();
+      });
+    } else if (data.Train_ID && data.Certificate_Type) {
+      // Find by Train_ID and Certificate_Type combination (for fitness certificates)
+      rowIndex = rows.findIndex((row, index) => {
+        if (index === 0) return false; // Skip header row
+        const trainId = row[headers.indexOf('Train_ID')];
+        const certType = row[headers.indexOf('Certificate_Type')];
+        return trainId === data.Train_ID && certType === data.Certificate_Type;
+      });
+    } else if (data.JobCard_ID) {
+      // Find by JobCard_ID (for job cards)
+      console.log(`Looking for JobCard_ID: ${data.JobCard_ID}`);
+      const jobCardIdIndex = headers.indexOf('JobCard_ID');
+      console.log(`JobCard_ID column index: ${jobCardIdIndex}`);
+      
+      rowIndex = rows.findIndex((row, index) => {
+        if (index === 0) return false; // Skip header row
+        const jobCardId = row[jobCardIdIndex];
+        console.log(`Comparing row ${index}: ${jobCardId} vs ${data.JobCard_ID}`);
+        return jobCardId === data.JobCard_ID.toString();
+      });
+      
+      console.log(`Found row index: ${rowIndex}`);
+    }
+    
+    if (rowIndex === -1) {
+      // Record not found, add as new record
+      const rowData = headers.map(header => data[header] || '');
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: SPREADSHEET_ID,
+        range: sheetName,
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [rowData],
+        },
+      });
+      console.log(`Added new record to ${sheetName}`);
+      res.json({ success: true, message: 'New record added successfully' });
+    } else {
+      // Update existing record
+      console.log(`Updating existing record at row ${rowIndex + 1}`);
+      console.log('Original row data:', rows[rowIndex]);
+      
+      const updatedRowData = headers.map(header => {
+        // Use new data if provided, otherwise keep existing data
+        const newValue = data[header] !== undefined ? data[header] : rows[rowIndex][headers.indexOf(header)] || '';
+        console.log(`Column ${header}: ${rows[rowIndex][headers.indexOf(header)]} -> ${newValue}`);
+        return newValue;
+      });
+      
+      console.log('Updated row data:', updatedRowData);
+      
+      const updateRange = `${sheetName}!A${rowIndex + 1}:${String.fromCharCode(65 + headers.length - 1)}${rowIndex + 1}`;
+      console.log(`Update range: ${updateRange}`);
+      
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SPREADSHEET_ID,
+        range: updateRange,
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [updatedRowData],
+        },
+      });
+      
+      console.log(`Successfully updated record in ${sheetName} at row ${rowIndex + 1}`);
+      res.json({ success: true, message: 'Record updated successfully' });
+    }
+  } catch (error) {
+    console.error(`Error updating data in sheet ${req.params.sheetName}:`, error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message,
+      details: 'Check that the sheet exists and record can be found'
+    });
+  }
+});
+
+// Debug endpoint to check specific job card
+app.get('/api/debug/jobcard/:id', async (req, res) => {
+  try {
+    const jobCardId = req.params.id;
+    
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: 'job_cards',
+    });
+    
+    const rows = response.data.values;
+    if (!rows || rows.length === 0) {
+      return res.json({ error: 'No data found' });
+    }
+    
+    const headers = rows[0];
+    const jobCardIdIndex = headers.indexOf('JobCard_ID');
+    
+    // Find the specific job card
+    const foundRow = rows.find((row, index) => {
+      if (index === 0) return false; // Skip header
+      return row[jobCardIdIndex] === jobCardId;
+    });
+    
+    if (foundRow) {
+      const jobCard = {};
+      headers.forEach((header, index) => {
+        jobCard[header] = foundRow[index] || '';
+      });
+      res.json({ found: true, data: jobCard, headers });
+    } else {
+      res.json({ found: false, headers, totalRows: rows.length });
+    }
+    
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // API endpoint to get dashboard stats
 app.get('/api/stats', async (req, res) => {
   try {

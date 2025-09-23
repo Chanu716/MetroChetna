@@ -79,7 +79,7 @@ const FORM_CONFIGS = {
             { name: 'To_Index', label: 'To Index', type: 'number', required: true },
             { name: 'Shunting_Time_Minutes', label: 'Shunting Time (Minutes)', type: 'number', required: true },
             { name: 'Energy_Cost_kWh', label: 'Energy Cost (kWh)', type: 'number', step: '0.01', required: true },
-            { name: 'Safety_Risk_Score', label: 'Safety Risk Score', type: 'number', required: true }
+            { name: 'Risk_Score', label: 'Risk Score', type: 'number', required: true }
         ]
     }
 };
@@ -201,7 +201,7 @@ function getSheetName(sectionName) {
         'fitness': 'fitness_certificates',
         'jobcards': 'job_cards',
         'mileage': 'mileage',
-        'stabling': 'stabling_geometry_actual',
+        'stabling': 'stabling_geometry',
         
         // Form types (singular)
         'train': 'train_master',
@@ -209,7 +209,7 @@ function getSheetName(sectionName) {
         'fitness': 'fitness_certificates',
         'jobcard': 'job_cards',
         'mileage': 'mileage',
-        'stabling': 'stabling_geometry_actual'
+        'stabling': 'stabling_geometry'
     };
     return sheetNames[sectionName] || sectionName;
 }
@@ -282,7 +282,7 @@ function displayTableData(sectionName, data, tableBody) {
                     <td>${record.To_Bay || ''}</td>
                     <td>${record.Shunting_Time_Minutes || ''}</td>
                     <td>${record.Energy_Cost_kWh || ''}</td>
-                    <td>${record.Safety_Risk_Score || ''}</td>
+                    <td>${record.Risk_Score || ''}</td>
                 `;
                 break;
         }

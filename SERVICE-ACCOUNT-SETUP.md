@@ -37,7 +37,7 @@ Create these 6 tabs in your Google Sheet:
 - `fitness_certificates`
 - `job_cards`
 - `mileage`
-- `stabling_geometry_actual`
+- `stabling_geometry`
 
 ### Step 5: Copy Data
 Import your CSV data into each corresponding sheet tab.

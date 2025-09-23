@@ -163,6 +163,11 @@
             </div>
             
             <div class="form-group">
+                <label for="newTrainID">Train ID</label>
+                <input type="text" id="newTrainID" name="newTrainID" required placeholder="Enter Train ID (e.g., T001, T002...)">
+            </div>
+            
+            <div class="form-group">
                 <label for="openDate">Open Date</label>
                 <input type="date" id="openDate" name="openDate" readonly>
             </div>
@@ -193,6 +198,11 @@
             </div>
             
             <div id="jobCardDetails" style="display: none;">
+                <div class="form-group">
+                    <label for="displayTrainID">Train ID</label>
+                    <input type="text" id="displayTrainID" name="displayTrainID" readonly>
+                </div>
+                
                 <div class="form-group">
                     <label for="displayOpenDate">Opened Date</label>
                     <input type="text" id="displayOpenDate" name="displayOpenDate" readonly>
@@ -289,6 +299,7 @@
         const selectedCard = openJobCards.find(card => card.JobCard_ID === selectedId);
         
         if (selectedCard) {
+            document.getElementById('displayTrainID').value = selectedCard.Train_ID || 'Not specified';
             document.getElementById('displayOpenDate').value = selectedCard.Opened_Date;
             document.getElementById('displayTaskDescription').value = selectedCard.Task_Description;
             document.getElementById('jobCardDetails').style.display = 'block';
@@ -301,6 +312,7 @@
         
         const jobCardData = {
             JobCard_ID: document.getElementById('newJobCardID').value,
+            Train_ID: document.getElementById('newTrainID').value,
             Task_Description: document.getElementById('newTaskDescription').value,
             Opened_Date: document.getElementById('openDate').value,
             Status: 'Open',

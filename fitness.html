@@ -5,6 +5,161 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fitness Certificates</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Dynamic Section Styles */
+        .form-section {
+            display: none;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            margin-top: 30px;
+            padding: 30px 40px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            box-shadow: 0 4px 16px rgba(92, 107, 192, 0.1);
+            animation: slideDown 0.3s ease-in-out;
+        }
+        
+        .form-section.active {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        
+        .close-section {
+            color: #6c757d;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+            padding: 5px;
+            margin-right: 10px;
+            transition: color 0.3s ease;
+        }
+        
+        .close-section:hover {
+            color: #5c6bc0;
+        }
+
+        .form-section h3 {
+            margin-bottom: 25px;
+            color: #1a237e;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        /* Checkbox styling */
+        .checkbox-container {
+            display: block;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            user-select: none;
+            color: #1a237e;
+        }
+
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: #ffffff;
+            border: 2px solid #e9ecef;
+            border-radius: 4px;
+        }
+
+        .checkbox-container:hover input ~ .checkmark {
+            border-color: #5c6bc0;
+        }
+
+        .checkbox-container input:checked ~ .checkmark {
+            background: linear-gradient(135deg, #5c6bc0 0%, #7986cb 100%);
+            border-color: #5c6bc0;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .checkbox-container .checkmark:after {
+            left: 6px;
+            top: 2px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Overlay styles */
+        .overlay {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .overlay-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            margin: 15% auto;
+            padding: 40px;
+            border-radius: 12px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(92, 107, 192, 0.2);
+        }
+
+        .overlay-content h3 {
+            color: #1a237e;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .overlay-content p {
+            color: #6c757d;
+            margin-bottom: 25px;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+    </style>
 </head>
 <body>
 
@@ -16,112 +171,366 @@
     <form id="fitnessForm">
         <div class="form-row">
             <div class="form-group">
-                <label for="recordID">Record ID</label>
-                <input type="text" id="recordID" name="recordID" readonly>
-            </div>
-            <div class="form-group">
                 <label for="trainID">Train ID</label>
-                <select id="trainID" name="trainID">
+                <select id="trainID" name="trainID" required>
                     <option value="" disabled selected>Select a Train ID</option>
                     <option value="T001">T001</option><option value="T002">T002</option><option value="T003">T003</option><option value="T004">T004</option><option value="T005">T005</option><option value="T006">T006</option><option value="T007">T007</option><option value="T008">T008</option><option value="T009">T009</option><option value="T010">T010</option><option value="T011">T011</option><option value="T012">T012</option><option value="T013">T013</option><option value="T014">T014</option><option value="T015">T015</option><option value="T016">T016</option><option value="T017">T017</option><option value="T018">T018</option><option value="T019">T019</option><option value="T020">T020</option><option value="T021">T021</option><option value="T022">T022</option><option value="T023">T023</option><option value="T024">T024</option><option value="T025">T025</option>
                 </select>
             </div>
-        </div>
-
-        <div class="form-row">
             <div class="form-group">
                 <label for="certificateType">Certificate Type</label>
-                <select id="certificateType" name="certificateType">
+                <select id="certificateType" name="certificateType" required>
+                    <option value="" disabled selected>Select Certificate Type</option>
                     <option value="RollingStock">Rolling Stock</option>
                     <option value="Signalling">Signalling</option>
                     <option value="Telecom">Telecom</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="status">Status</label>
-                <select id="status" name="status">
-                    <option value="Valid">Valid</option>
-                    <option value="Pending">Awaiting Approval</option>
-                    <option value="Expired">Expired</option>
-                </select>
-            </div>
         </div>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label for="issuedDate">Issued Date</label>
-                <input type="date" id="issuedDate" name="issuedDate" required>
-                <span id="issuedDateError" class="error"></span>
-            </div>
-            <div class="form-group">
-                <label for="expiryDate">Expiry Date</label>
-                <input type="date" id="expiryDate" name="expiryDate" required>
-                <span id="expiryDateError" class="error"></span>
-            </div>
-        </div>
-        
         <div class="form-group">
-            <label for="remarks">Remarks</label>
-            <input type="text" id="remarks" name="remarks">
+            <label for="currentStatus">Current Status</label>
+            <input type="text" id="currentStatus" name="currentStatus" readonly placeholder="Select Train ID and Certificate Type to view status">
         </div>
         
         <div class="button-container">
-            <button type="submit" class="submit-btn">Submit</button>
+            <button type="button" id="checkStatusBtn" class="submit-btn" disabled>Check Status</button>
         </div>
     </form>
 </div>
 
+    <!-- Dynamic Status Sections -->
+    <!-- Valid Status Section -->
+    <div id="validSection" class="form-section">
+        <div class="section-header">
+            <span class="close-section" onclick="hideSection('validSection')">&times;</span>
+        </div>
+        <h3>Certificate Information</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="displayIssuedDate">Issued Date</label>
+                <input type="date" id="displayIssuedDate" readonly>
+            </div>
+            <div class="form-group">
+                <label for="displayExpiryDate">Expiry Date</label>
+                <input type="date" id="displayExpiryDate" readonly>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expired Status Section -->
+    <div id="expiredSection" class="form-section">
+        <div class="section-header">
+            <span class="close-section" onclick="hideSection('expiredSection')">&times;</span>
+        </div>
+        <h3>Renew Expired Certificate</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="oldIssuedDate">Old Issued Date</label>
+                <input type="date" id="oldIssuedDate" readonly>
+            </div>
+            <div class="form-group">
+                <label for="oldExpiryDate">Old Expiry Date</label>
+                <input type="date" id="oldExpiryDate" readonly>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="newIssuedDate">New Issued Date</label>
+                <input type="date" id="newIssuedDate" required>
+            </div>
+            <div class="form-group">
+                <label for="newExpiryDate">New Expiry Date</label>
+                <input type="date" id="newExpiryDate" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="expectedDeliveryDate">Expected Date of Delivery</label>
+            <input type="date" id="expectedDeliveryDate" required>
+        </div>
+        <div class="button-container">
+            <button type="button" id="saveExpiredBtn" class="submit-btn">Save Renewal</button>
+        </div>
+    </div>
+
+    <!-- Awaiting Approval Section -->
+    <div id="awaitingSection" class="form-section">
+        <div class="section-header">
+            <span class="close-section" onclick="hideSection('awaitingSection')">&times;</span>
+        </div>
+        <h3>Certificate Under Approval</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="pendingIssuedDate">New Issued Date</label>
+                <input type="date" id="pendingIssuedDate" readonly>
+            </div>
+            <div class="form-group">
+                <label for="pendingExpiryDate">New Expiry Date</label>
+                <input type="date" id="pendingExpiryDate" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="pendingDeliveryDate">Expected Delivery Date</label>
+            <input type="date" id="pendingDeliveryDate" readonly>
+        </div>
+        <div class="form-group">
+            <label class="checkbox-container">
+                <input type="checkbox" id="deliveredCheckbox">
+                <span class="checkmark">Delivered</span>
+            </label>
+        </div>
+        <div class="button-container" id="deliveryButtonContainer" style="display: none;">
+            <button type="button" id="markDeliveredBtn" class="submit-btn">Confirm Delivery</button>
+        </div>
+    </div>
+
+    <!-- Success Message Overlay -->
+    <div id="successOverlay" class="overlay" style="display: none;">
+        <div class="overlay-content">
+            <h3>Success!</h3>
+            <p id="successMessage">Record saved successfully. Refreshing page...</p>
+            <button class="submit-btn" onclick="refreshPage()">OK</button>
+        </div>
+    </div>
+
+</div>
+
 <script>
-    const form = document.getElementById('fitnessForm');
-    const recordIDInput = document.getElementById('recordID');
-    const issuedDateInput = document.getElementById('issuedDate');
-    const expiryDateInput = document.getElementById('expiryDate');
-    const issuedDateError = document.getElementById('issuedDateError');
-    const expiryDateError = document.getElementById('expiryDateError');
-    const lastRecordID = 62; // From fitness_certificates.csv
+    // DOM Elements
+    const trainIDSelect = document.getElementById('trainID');
+    const certificateTypeSelect = document.getElementById('certificateType');
+    const currentStatusInput = document.getElementById('currentStatus');
+    const checkStatusBtn = document.getElementById('checkStatusBtn');
+    
+    let currentRecord = null;
 
-    recordIDInput.value = lastRecordID + 1;
-
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        issuedDateError.textContent = '';
-        expiryDateError.textContent = '';
-        let isValid = true;
-
-        const issuedDate = new Date(issuedDateInput.value);
-        const expiryDate = new Date(expiryDateInput.value);
+    // Enable check status button when both selections are made
+    function checkFormValidity() {
+        const trainID = trainIDSelect.value;
+        const certificateType = certificateTypeSelect.value;
         
-        if (issuedDate >= expiryDate) {
-            expiryDateError.textContent = 'Expiry Date must be after Issued Date.';
-            isValid = false;
+        if (trainID && certificateType) {
+            checkStatusBtn.disabled = false;
+            currentStatusInput.placeholder = "Click 'Check Status' to view current status";
+        } else {
+            checkStatusBtn.disabled = true;
+            currentStatusInput.value = '';
+            currentStatusInput.placeholder = "Select Train ID and Certificate Type to view status";
+            hideAllSections();
+        }
+    }
+
+    // Event listeners for form validation
+    trainIDSelect.addEventListener('change', checkFormValidity);
+    certificateTypeSelect.addEventListener('change', checkFormValidity);
+
+    // Check Status Button Click
+    checkStatusBtn.addEventListener('click', async function() {
+        const trainID = trainIDSelect.value;
+        const certificateType = certificateTypeSelect.value;
+        
+        if (!trainID || !certificateType) {
+            return;
         }
 
-        if (isValid) {
-            // Prepare data for Google Sheets
-            const fitnessData = {
-                Record_ID: recordIDInput.value,
-                Train_ID: document.getElementById('trainID').value,
-                Certificate_Type: document.getElementById('certificateType').value,
-                Issued_Date: document.getElementById('issuedDate').value,
-                Expiry_Date: document.getElementById('expiryDate').value,
-                Status: document.getElementById('status').value,
-                Remarks: document.getElementById('remarks').value || 'Certificate updated'
-            };
+        try {
+            // Fetch data from Google Sheets based on Train ID and Certificate Type
+            const record = await railwayAPI.getFitnessRecord(trainID, certificateType);
             
-            try {
-                // Save to Google Sheets
-                await railwayAPI.saveFitnessData(fitnessData);
-                railwayAPI.showMessage('Fitness Certificate updated successfully!');
-                
-                // Reset form and increment record ID
-                form.reset();
-                recordIDInput.value = parseInt(recordIDInput.value) + 1;
-                
-            } catch (error) {
-                railwayAPI.showMessage(`Error updating fitness certificate: ${error.message}`, 'error');
+            if (record) {
+                currentRecord = record;
+                currentStatusInput.value = record.Status;
+                showStatusSection(record.Status, record);
+            } else {
+                // No record found - treat as new certificate (Expired status to allow creation)
+                currentStatusInput.value = 'No Record Found - New Certificate';
+                const newRecord = {
+                    Train_ID: trainID,
+                    Certificate_Type: certificateType,
+                    Status: 'Expired',
+                    Issued_Date: '',
+                    Expiry_Date: '',
+                    Expected_Delivery_Date: ''
+                };
+                currentRecord = newRecord;
+                showStatusSection('Expired', newRecord);
             }
+        } catch (error) {
+            railwayAPI.showMessage(`Error fetching certificate data: ${error.message}`, 'error');
         }
     });
+
+    // Show appropriate section based on status
+    function showStatusSection(status, record) {
+        hideAllSections();
+        
+        switch (status) {
+            case 'Valid':
+                showValidSection(record);
+                break;
+            case 'Expired':
+                showExpiredSection(record);
+                break;
+            case 'Awaiting Approval':
+                showAwaitingSection(record);
+                break;
+        }
+    }
+
+    // Hide all dynamic sections
+    function hideAllSections() {
+        const sections = ['validSection', 'expiredSection', 'awaitingSection'];
+        sections.forEach(sectionId => {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.remove('active');
+                section.style.display = 'none';
+            }
+        });
+    }
+
+    // Hide specific section
+    function hideSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.classList.remove('active');
+            section.style.display = 'none';
+        }
+    }
+
+    // Show Valid Status Section
+    function showValidSection(record) {
+        const section = document.getElementById('validSection');
+        
+        // Populate fields
+        document.getElementById('displayIssuedDate').value = record.Issued_Date;
+        document.getElementById('displayExpiryDate').value = record.Expiry_Date;
+        
+        // Show section
+        section.style.display = 'block';
+        section.classList.add('active');
+    }
+
+    // Show Expired Status Section
+    function showExpiredSection(record) {
+        const section = document.getElementById('expiredSection');
+        
+        // Populate old dates (if they exist)
+        document.getElementById('oldIssuedDate').value = record.Issued_Date || '';
+        document.getElementById('oldExpiryDate').value = record.Expiry_Date || '';
+        
+        // Clear new date fields
+        document.getElementById('newIssuedDate').value = '';
+        document.getElementById('newExpiryDate').value = '';
+        document.getElementById('expectedDeliveryDate').value = '';
+        
+        // Show section
+        section.style.display = 'block';
+        section.classList.add('active');
+        
+        // Add save button event listener
+        document.getElementById('saveExpiredBtn').onclick = saveExpiredCertificate;
+    }
+
+    // Show Awaiting Approval Section
+    function showAwaitingSection(record) {
+        const section = document.getElementById('awaitingSection');
+        
+        // Populate fields
+        document.getElementById('pendingIssuedDate').value = record.Issued_Date;
+        document.getElementById('pendingExpiryDate').value = record.Expiry_Date;
+        document.getElementById('pendingDeliveryDate').value = record.Expected_Delivery_Date;
+        
+        // Reset checkbox
+        const checkbox = document.getElementById('deliveredCheckbox');
+        checkbox.checked = false;
+        document.getElementById('deliveryButtonContainer').style.display = 'none';
+        
+        // Show section
+        section.style.display = 'block';
+        section.classList.add('active');
+        
+        // Add checkbox event listener
+        checkbox.onchange = function() {
+            document.getElementById('deliveryButtonContainer').style.display = 
+                this.checked ? 'block' : 'none';
+        };
+        
+        // Add delivery button event listener
+        document.getElementById('markDeliveredBtn').onclick = markAsDelivered;
+    }
+
+    // Save Expired Certificate (Renewal)
+    async function saveExpiredCertificate() {
+        const newIssuedDate = document.getElementById('newIssuedDate').value;
+        const newExpiryDate = document.getElementById('newExpiryDate').value;
+        const expectedDeliveryDate = document.getElementById('expectedDeliveryDate').value;
+        
+        if (!newIssuedDate || !newExpiryDate || !expectedDeliveryDate) {
+            railwayAPI.showMessage('Please fill all required fields', 'error');
+            return;
+        }
+        
+        // Validate dates
+        if (new Date(newIssuedDate) >= new Date(newExpiryDate)) {
+            railwayAPI.showMessage('Expiry date must be after issued date', 'error');
+            return;
+        }
+        
+        try {
+            const renewalData = {
+                Train_ID: currentRecord.Train_ID,
+                Certificate_Type: currentRecord.Certificate_Type,
+                Issued_Date: newIssuedDate,
+                Expiry_Date: newExpiryDate,
+                Expected_Delivery_Date: expectedDeliveryDate,
+                Status: 'Awaiting Approval',
+                Remarks: 'Certificate renewed - awaiting approval'
+            };
+            
+            await railwayAPI.saveFitnessData(renewalData);
+            showSuccessMessage('Certificate renewal saved successfully!');
+            
+        } catch (error) {
+            railwayAPI.showMessage(`Error saving certificate renewal: ${error.message}`, 'error');
+        }
+    }
+
+    // Mark as Delivered
+    async function markAsDelivered() {
+        try {
+            const deliveryData = {
+                Train_ID: currentRecord.Train_ID,
+                Certificate_Type: currentRecord.Certificate_Type,
+                Issued_Date: currentRecord.Issued_Date,
+                Expiry_Date: currentRecord.Expiry_Date,
+                Expected_Delivery_Date: '', // Clear expected delivery date
+                Status: 'Valid',
+                Remarks: 'Certificate delivered and activated'
+            };
+            
+            await railwayAPI.saveFitnessData(deliveryData);
+            showSuccessMessage('Certificate marked as delivered and activated!');
+            
+        } catch (error) {
+            railwayAPI.showMessage(`Error updating certificate delivery: ${error.message}`, 'error');
+        }
+    }
+
+    // Show success message and refresh page
+    function showSuccessMessage(message) {
+        document.getElementById('successMessage').textContent = message + ' Refreshing page...';
+        document.getElementById('successOverlay').style.display = 'block';
+    }
+
+    // Refresh page
+    function refreshPage() {
+        window.location.reload();
+    }
+
+    // Make functions globally available
+    window.hideSection = hideSection;
+    window.refreshPage = refreshPage;
 </script>
 
 <!-- Include the Railway API -->

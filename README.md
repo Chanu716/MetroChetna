@@ -40,7 +40,7 @@ IBM Maximo Clone (HTML/CSS/JS) → Google Sheets → MetroChetna Algorithm
    - `fitness_certificates`
    - `job_cards`
    - `mileage`
-   - `stabling_geometry_actual`
+   - `stabling_geometry`
 
 #### Step 2: Set up column headers
 Copy headers from your existing CSV files to each sheet:
@@ -117,7 +117,7 @@ const GOOGLE_SHEETS_CONFIG = {
         fitness: 'fitness_certificates',
         jobcards: 'job_cards',
         mileage: 'mileage',
-        stabling: 'stabling_geometry_actual'
+        stabling: 'stabling_geometry'
     }
 };
 ```
@@ -314,7 +314,7 @@ const GOOGLE_SHEETS_CONFIG = {
         fitness: 'fitness_certificates',
         jobcards: 'job_cards',
         mileage: 'mileage',
-        stabling: 'stabling_geometry_actual'
+        stabling: 'stabling_geometry'
     }
 };
 ```
