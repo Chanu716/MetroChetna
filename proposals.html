@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scheduling Proposals Runner</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 20px; }
+    button { padding: 8px 14px; border-radius: 6px; border: 1px solid #ccc; cursor: pointer; }
+    .row { margin: 12px 0; }
+    pre { background: #f7f7f8; padding: 12px; border-radius: 8px; max-height: 50vh; overflow: auto; }
+    .pill { display: inline-block; padding: 4px 8px; border-radius: 999px; background:#eef; margin-right:8px; }
+    .counts { margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <h1>Scheduling Proposals</h1>
+  <div class="row">
+    <button id="run">Run Algorithm</button>
+    <button id="approve" disabled>Approve All</button>
+  </div>
+  <div class="row counts" id="counts"></div>
+  <div class="row">
+    <h3>Proposals JSON</h3>
+    <pre id="out">Click "Run Algorithm" to generate proposals...</pre>
+  </div>
+
+  <script src="railway-api.js"></script>
+  <script>
+    const $ = sel => document.querySelector(sel);
+    const out = $('#out');
+    const counts = $('#counts');
+    const runBtn = $('#run');
+    const approveBtn = $('#approve');
+
+    let latestPayload = null;
+    let latestProposals = null;
+
+    async function runAlgo() {
+      out.textContent = 'Running...';
+      counts.textContent = '';
+      approveBtn.disabled = true;
+      try {
+        const { proposals, payload } = await window.railwayAPI.runSchedulingAlgorithm();
+        latestProposals = proposals;
+        latestPayload = payload;
+        out.textContent = JSON.stringify(proposals, null, 2);
+        const c = {
+          logs: payload.logs.length,
+          cleaningSlots: payload.cleaningSlots.length,
+          jobCardsToClose: payload.jobCardsToClose.length,
+          serviceChecksToUpdate: payload.serviceChecksToUpdate.length,
+          brandingAccumulations: payload.brandingAccumulations.length
+        };
+        counts.innerHTML = Object.entries(c).map(([k,v]) => `<span class="pill">${k}: ${v}</span>`).join('');
+        approveBtn.disabled = c.logs + c.cleaningSlots + c.jobCardsToClose + c.serviceChecksToUpdate + c.brandingAccumulations === 0;
+      } catch (e) {
+        out.textContent = 'Error: ' + (e && e.message || e);
+      }
+    }
+
+    async function approveAll() {
+      if (!latestPayload) return;
+      approveBtn.disabled = true;
+      try {
+        const result = await window.railwayAPI.approveProposals(latestPayload);
+        const summary = `Approved: logs=${result.logsAppended}, slots=${result.slotsOccupied}, jobsClosed=${result.jobCardsClosed}, svcUpdated=${result.serviceChecksUpdated}, brandingUpdated=${result.brandingUpdated}`;
+        if (window.railwayAPI.showMessage) window.railwayAPI.showMessage(summary, 'success');
+        alert(summary);
+      } catch (e) {
+        alert('Approval failed: ' + (e && e.message || e));
+        if (window.railwayAPI.showMessage) window.railwayAPI.showMessage('Approval failed', 'error');
+      } finally {
+        approveBtn.disabled = false;
+      }
+    }
+
+    runBtn.addEventListener('click', runAlgo);
+    approveBtn.addEventListener('click', approveAll);
+  </script>
+</body>
+</html>

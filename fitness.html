@@ -9,9 +9,15 @@
         /* Dynamic Section Styles */
         .form-section {
             display: none;
-            background: transparent;
-            margin-top: 30px;
-            padding: 20px 0;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            /* Align width and position with the main container */
+            margin: 30px auto 0;
+            max-width: 900px;
+            box-sizing: border-box;
+            padding: 30px 40px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            box-shadow: 0 4px 16px rgba(92, 107, 192, 0.1);
             animation: slideDown 0.3s ease-in-out;
         }
         
@@ -84,7 +90,7 @@
             left: 0;
             height: 20px;
             width: 20px;
-            background-color: #f8f9fa;
+            background-color: #ffffff;
             border: 2px solid #e9ecef;
             border-radius: 4px;
         }
@@ -132,7 +138,7 @@
         }
 
         .overlay-content {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
             margin: 15% auto;
             padding: 40px;
             border-radius: 12px;
@@ -194,6 +200,7 @@
             <button type="button" id="checkStatusBtn" class="submit-btn" disabled>Check Status</button>
         </div>
     </form>
+</div>
 
     <!-- Dynamic Status Sections -->
     <!-- Valid Status Section -->
@@ -212,9 +219,10 @@
                 <input type="date" id="displayExpiryDate" readonly>
             </div>
         </div>
+    </div>
 
-        <!-- Expired Status Section -->
-        <div id="expiredSection" class="form-section">
+    <!-- Expired Status Section -->
+    <div id="expiredSection" class="form-section">
         <div class="section-header">
             <span class="close-section" onclick="hideSection('expiredSection')">&times;</span>
         </div>
@@ -246,10 +254,10 @@
         <div class="button-container">
             <button type="button" id="saveExpiredBtn" class="submit-btn">Save Renewal</button>
         </div>
-        </div>
+    </div>
 
-        <!-- Awaiting Approval Section -->
-        <div id="awaitingSection" class="form-section">
+    <!-- Awaiting Approval Section -->
+    <div id="awaitingSection" class="form-section">
         <div class="section-header">
             <span class="close-section" onclick="hideSection('awaitingSection')">&times;</span>
         </div>
@@ -270,13 +278,13 @@
         </div>
         <div class="form-group">
             <label class="checkbox-container">
+                Delivered
                 <input type="checkbox" id="deliveredCheckbox">
-                <span class="checkmark">Delivered</span>
+                <span class="checkmark"></span>
             </label>
         </div>
         <div class="button-container" id="deliveryButtonContainer" style="display: none;">
             <button type="button" id="markDeliveredBtn" class="submit-btn">Confirm Delivery</button>
-        </div>
         </div>
     </div>
 

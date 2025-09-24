@@ -18,7 +18,6 @@
             <label for="trainID">Train ID</label>
             <select id="trainID" name="trainID">
                 <option value="" disabled selected>Select a Train ID</option>
-                <option value="T001">T001</option><option value="T002">T002</option><option value="T003">T003</option><option value="T004">T004</option><option value="T005">T005</option><option value="T006">T006</option><option value="T007">T007</option><option value="T008">T008</option><option value="T009">T009</option><option value="T010">T010</option><option value="T011">T011</option><option value="T012">T012</option><option value="T013">T013</option><option value="T014">T014</option><option value="T015">T015</option><option value="T016">T016</option><option value="T017">T017</option><option value="T018">T018</option><option value="T019">T019</option><option value="T020">T020</option><option value="T021">T021</option><option value="T022">T022</option><option value="T023">T023</option><option value="T024">T024</option><option value="T025">T025</option>
             </select>
         </div>
 
@@ -27,10 +26,7 @@
             <input type="text" id="totalKM" name="totalKM" readonly>
         </div>
 
-        <div class="form-group">
-            <label for="selectedDate">Date</label>
-            <input type="date" id="selectedDate" name="selectedDate" required>
-        </div>
+        <!-- Removed Date field: updates should not include per-day rows -->
 
         <div class="form-group">
             <label for="kmTravelled">Kilometers Travelled</label>
@@ -44,75 +40,100 @@
 </div>
 
 <script>
-    const mileageData = {
-        'T001': { totalKM: 615228 }, 'T002': { totalKM: 534810 }, 'T003': { totalKM: 688905 }, 'T004': { totalKM: 643102 },
-        'T005': { totalKM: 701339 }, 'T006': { totalKM: 562774 }, 'T007': { totalKM: 632505 }, 'T008': { totalKM: 715442 },
-        'T009': { totalKM: 589120 }, 'T010': { totalKM: 678913 }, 'T011': { totalKM: 518377 }, 'T012': { totalKM: 645119 },
-        'T013': { totalKM: 720546 }, 'T014': { totalKM: 598881 }, 'T015': { totalKM: 660492 }, 'T016': { totalKM: 699701 },
-        'T017': { totalKM: 541285 }, 'T018': { totalKM: 625390 }, 'T019': { totalKM: 578013 }, 'T020': { totalKM: 705644 },
-        'T021': { totalKM: 651877 }, 'T022': { totalKM: 730911 }, 'T023': { totalKM: 588725 }, 'T024': { totalKM: 672199 },
-        'T025': { totalKM: 609458 }
-    };
+    // Live data loaded from Sheets
+    let mileageByTrain = {};
+    let trainsLoaded = false;
 
     const form = document.getElementById('mileageForm');
     const trainIDSelect = document.getElementById('trainID');
     const totalKMInput = document.getElementById('totalKM');
-    const selectedDateInput = document.getElementById('selectedDate');
+    // No date input anymore
     const kmTravelledInput = document.getElementById('kmTravelled');
 
-    trainIDSelect.addEventListener('change', () => {
-        const selectedTrainID = trainIDSelect.value;
-        const data = mileageData[selectedTrainID];
-        if (data) {
-            totalKMInput.value = data.totalKM.toLocaleString();
-        } else {
-            totalKMInput.value = '';
+    // Populate Train IDs from Sheets
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            if (!railwayAPI.isServerAvailable) {
+                await railwayAPI.checkServerConnection();
+            }
+            const rows = await railwayAPI.getMileageData();
+            const options = new Set();
+            mileageByTrain = {};
+            (rows || []).forEach(r => {
+                const id = (r.Train_ID || '').trim();
+                if (id) {
+                    options.add(id);
+                    mileageByTrain[id] = r;
+                }
+            });
+            // Populate select
+            options.forEach(id => {
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.textContent = id;
+                trainIDSelect.appendChild(opt);
+            });
+            trainsLoaded = true;
+            form.querySelector('button[type="submit"]').disabled = true;
+        } catch (e) {
+            trainsLoaded = false;
+            railwayAPI.showMessage('Unable to load Train IDs. Please check server connection.', 'error');
+            form.querySelector('button[type="submit"]').disabled = true;
         }
     });
 
-    // Set default date to today
-    selectedDateInput.value = new Date().toISOString().split('T')[0];
+    function updateSubmitEnabled() {
+        const validTrain = !!trainIDSelect.value;
+        const km = parseFloat(kmTravelledInput.value);
+        const validKm = !isNaN(km) && km > 0;
+        form.querySelector('button[type="submit"]').disabled = !(trainsLoaded && validTrain && validKm);
+    }
+
+    trainIDSelect.addEventListener('change', () => {
+        const selectedTrainID = trainIDSelect.value;
+        const row = mileageByTrain[selectedTrainID];
+        if (row && row.Total_KM !== undefined) {
+            // Show as locale string; strip commas for calculations later
+            const num = parseInt((row.Total_KM || '0').toString().replace(/[,\s]/g, ''), 10) || 0;
+            totalKMInput.value = num.toLocaleString('en-IN');
+        } else {
+            totalKMInput.value = '';
+        }
+        updateSubmitEnabled();
+    });
+
+    kmTravelledInput.addEventListener('input', updateSubmitEnabled);
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         
-        const trainID = trainIDSelect.value;
-        const selectedDate = selectedDateInput.value;
+    const trainID = trainIDSelect.value;
         const kmTravelled = parseFloat(kmTravelledInput.value);
         const existingKM = parseInt(totalKMInput.value.replace(/,/g, ''), 10);
         const totalNewKM = existingKM + kmTravelled;
         
-        // Validate date is not in the future
-        const today = new Date().toISOString().split('T')[0];
-        if (selectedDate > today) {
-            railwayAPI.showMessage('Cannot enter kilometers for future dates!', 'error');
-            return;
-        }
-        
-        // Prepare data for Google Sheets
-        const mileageData = {
-            Train_ID: trainID,
-            Date: selectedDate,
-            KM_Travelled: kmTravelled.toString(),
+        // Prepare data for Google Sheets (update existing row by Train_ID)
+        const payload = {
             Total_KM: totalNewKM.toString(),
-            KM_Since_Last_A: totalNewKM.toString(), // Updated total
+            KM_Since_Last_A: totalNewKM.toString(),
             KM_Since_Last_B: totalNewKM.toString(),
             KM_Since_Last_C: totalNewKM.toString(),
             KM_Since_Last_D: totalNewKM.toString(),
-            Last_Service_Date: selectedDate,
             Daily_Avg_KM: kmTravelled.toString()
         };
         
         try {
-            // Save to Google Sheets
-            await railwayAPI.saveMileageData(mileageData);
-            railwayAPI.showMessage(`Mileage recorded successfully! ${kmTravelled} KM added for ${trainID} on ${selectedDate}. New total: ${totalNewKM.toLocaleString()} KM.`);
+            // Update existing mileage row by Train_ID
+            await railwayAPI.updateMileageData(trainID, payload);
+            railwayAPI.showMessage(`Mileage recorded successfully! ${kmTravelled} KM added for ${trainID}. New total: ${totalNewKM.toLocaleString()} KM.`);
             
             // Update the displayed total
-            mileageData[trainID] = { totalKM: totalNewKM };
+            // Update local cache so UI stays in sync
+            if (!mileageByTrain[trainID]) mileageByTrain[trainID] = {};
+            mileageByTrain[trainID].Total_KM = totalNewKM.toString();
             totalKMInput.value = totalNewKM.toLocaleString();
             
-            // Clear only the KM travelled field, keep train and date
+            // Clear only the KM travelled field, keep train selection
             kmTravelledInput.value = '';
             
         } catch (error) {

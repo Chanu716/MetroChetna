@@ -3,156 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Branding Priorities</title>
+    <title>Add New Campaign</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Match Job Card page theme */
+        .form-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            margin-top: 30px;
+            padding: 30px 40px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            box-shadow: 0 4px 16px rgba(92, 107, 192, 0.1);
+            animation: slideDown 0.3s ease-in-out;
+        }
+        @keyframes slideDown { from { opacity:0; transform: translateY(-20px);} to { opacity:1; transform: translateY(0);} }
+        .button-container { text-align:center; }
+        .muted { color:#6c757d; font-size:.9em; margin-top:6px; display:block; }
+        /* Simple two-column rows */
+        .row { display:flex; gap:20px; }
+        .row .form-group { flex:1; }
+        .inline-note { margin: 8px 0 16px 0; padding: 10px; background:#f3f4f6; border-radius:8px; color:#374151; }
+        /* Dynamic list area */
+        #newTrainSelectors .form-group { min-width: 220px; }
+    </style>
 </head>
 <body>
+
+<header class="gov-banner">
+        <div class="gov-banner__inner">Kochi Metro Rail</div>
+    </header>
 
 <div class="container">
     <div class="page-header">
         <button class="back-btn" onclick="window.location.href='dashboard.html'">←</button>
-        <h1>Update Branding Exposure</h1>
+    <h1>Add New Campaign</h1>
     </div>
-    <form id="brandingForm">
-        <div class="form-group">
-            <label for="trainID">Train ID</label>
-            <select id="trainID" name="trainID">
-                <option value="" disabled selected>Select a Train ID</option>
-                <option value="T005">T005</option>
-                <option value="T012">T012</option>
-                <option value="T020">T020</option>
-            </select>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label for="campaignID">Campaign ID</label>
-                <input type="text" id="campaignID" name="campaignID" readonly>
-            </div>
-            <div class="form-group">
-                <label for="advertiserID">Advertiser ID</label>
-                <input type="text" id="advertiserID" name="advertiserID" readonly>
-            </div>
-        </div>
 
-        <div class="form-group">
-            <label for="campaignName">Campaign Name</label>
-            <input type="text" id="campaignName" name="campaignName" readonly>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label for="requiredHours">Required Hours</label>
-                <input type="text" id="requiredHours" name="requiredHours" readonly>
+    <!-- Add Campaign Section -->
+    <div id="addCampaignSection" class="form-section">
+        <form id="addCampaignForm">
+            <div class="row">
+                <div class="form-group">
+                    <label for="newCampaignId">Campaign ID</label>
+                    <input id="newCampaignId" type="text" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="newCampaignName">Campaign Name</label>
+                    <input id="newCampaignName" type="text" placeholder="e.g., Winter Promo" required>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="accumulatedHours">Total Accumulated Hours</label>
-                <input type="text" id="accumulatedHours" name="accumulatedHours" readonly>
+            <div class="row">
+                <div class="form-group">
+                    <label for="newStartDate">Start Date</label>
+                    <input id="newStartDate" type="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="newEndDate">End Date</label>
+                    <input id="newEndDate" type="date" required>
+                </div>
             </div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label for="dailyHours">Hours Run Today</label>
-                <input type="number" id="dailyHours" name="dailyHours" value="0" min="0" required>
+            <div class="row">
+                <div class="form-group">
+                    <label for="newRequiredHours">Required Exposure Hours</label>
+                    <input id="newRequiredHours" type="number" min="0" step="1" placeholder="e.g., 800" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPenaltyPerDay">Penalty Per Day</label>
+                    <input id="newPenaltyPerDay" type="number" min="0" step="1" placeholder="e.g., 1000">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="overHours">Over Hours</label>
-                <input type="text" id="overHours" name="overHours" readonly>
+            <div id="availableBanner" class="inline-note">Loading availability…</div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="newTrainCount">Select number of trains</label>
+                    <select id="newTrainCount"></select>
+                    <div class="muted">Max equals available vacant trains.</div>
+                </div>
             </div>
-        </div>
-
-        <div class="form-group">
-            <label for="penalty">Penalty Per Day</label>
-            <input type="text" id="penalty" name="penalty" readonly>
-        </div>
-        
-        <div class="button-container">
-            <button type="submit" class="submit-btn">Update Hours</button>
-        </div>
-    </form>
+            <div id="newTrainSelectors" class="row" style="flex-wrap: wrap;"></div>
+            <div class="button-container">
+                <button type="submit" class="submit-btn">Save Campaign</button>
+            </div>
+        </form>
+    </div>
 </div>
-
+<!-- Include the Railway API first -->
+<script src="railway-api.js"></script>
 <script>
-    const brandingData = {
-        'T005': { campaignID: 'CAMP001', advertiserID: 'ADV01', campaignName: 'Summer Bonanza', requiredHours: 800, accumulatedHours: 300, penalty: 1000 },
-        'T012': { campaignID: 'CAMP001', advertiserID: 'ADV01', campaignName: 'Summer Bonanza', requiredHours: 800, accumulatedHours: 250, penalty: 1000 },
-        'T020': { campaignID: 'CAMP001', advertiserID: 'ADV01', campaignName: 'Summer Bonanza', requiredHours: 800, accumulatedHours: 50, penalty: 1000 }
-    };
+    // State
+    let allBranding = [];
+    let allMileage = [];
+    let availableTrainIds = [];
+    let selectedTrains = [];
 
-    const form = document.getElementById('brandingForm');
-    const trainIDSelect = document.getElementById('trainID');
-    const campaignIDInput = document.getElementById('campaignID');
-    const advertiserIDInput = document.getElementById('advertiserID');
-    const campaignNameInput = document.getElementById('campaignName');
-    const requiredHoursInput = document.getElementById('requiredHours');
-    const accumulatedHoursInput = document.getElementById('accumulatedHours');
-    const dailyHoursInput = document.getElementById('dailyHours');
-    const overHoursInput = document.getElementById('overHours');
-    const penaltyInput = document.getElementById('penalty');
-
-    function updateOverHours() {
-        const required = parseInt(requiredHoursInput.value, 10);
-        const accumulated = parseInt(accumulatedHoursInput.value, 10);
-        const over = Math.max(0, accumulated - required);
-        overHoursInput.value = over;
+    // Helpers
+    function onlyNumbers(str) { return (str || '').replace(/\D+/g, ''); }
+    function parseIntSafe(v, d=0) { const n = parseInt(v, 10); return isNaN(n) ? d : n; }
+    function daysLeftStr(dateStr) { const end = new Date(dateStr); const today = new Date(); const ms = end - new Date(today.getFullYear(), today.getMonth(), today.getDate()); const days = Math.ceil(ms / (1000*60*60*24)); return isFinite(days) ? `${days} days` : ''; }
+    function normalizeTrainId(t){ return (t||'').toString().trim().toUpperCase(); }
+    function parseNumberSafe(v, d=0){
+        const n = parseFloat((v||'').toString().replace(/[^0-9.\-]/g,''));
+        return isNaN(n) ? d : n;
     }
 
-    trainIDSelect.addEventListener('change', () => {
-        const selectedTrainID = trainIDSelect.value;
-        const data = brandingData[selectedTrainID];
-        if (data) {
-            campaignIDInput.value = data.campaignID;
-            advertiserIDInput.value = data.advertiserID;
-            campaignNameInput.value = data.campaignName;
-            requiredHoursInput.value = data.requiredHours;
-            accumulatedHoursInput.value = data.accumulatedHours;
-            penaltyInput.value = data.penalty;
-            updateOverHours();
-        }
-    });
-
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        
-        const trainID = trainIDSelect.value;
-        const existingHours = parseInt(accumulatedHoursInput.value, 10);
-        const dailyHours = parseInt(dailyHoursInput.value, 10);
-        const totalHours = existingHours + dailyHours;
-        const required = parseInt(requiredHoursInput.value, 10);
-        
-        // Prepare data for Google Sheets
-        const brandingData = {
-            Campaign_ID: campaignIDInput.value,
-            Train_ID: trainID,
-            Advertiser_ID: advertiserIDInput.value,
-            Campaign_Name: campaignNameInput.value,
-            Start_Date: new Date().toISOString().split('T')[0], // Current date
-            End_Date: new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0], // 30 days later
-            Required_Exposure_Hours: required.toString(),
-            Accumulated_Exposure_Hours: totalHours.toString(),
-            Penalty_Per_Day: penaltyInput.value,
-            Remaining_Hours: Math.max(0, required - totalHours).toString()
-        };
-        
+    // Data loaders
+    async function loadData() {
         try {
-            // Save to Google Sheets
-            await railwayAPI.saveBrandingData(brandingData);
-            railwayAPI.showMessage(`Branding updated successfully! New total hours for ${trainID}: ${totalHours}.`);
-            
-            // Update the form display
-            accumulatedHoursInput.value = totalHours;
-            updateOverHours();
-            dailyHoursInput.value = '';
-            
-        } catch (error) {
-            railwayAPI.showMessage(`Error updating branding: ${error.message}`, 'error');
+            if (!railwayAPI.isServerAvailable) {
+                await railwayAPI.checkServerConnection();
+            }
+            const [branding, mileage] = await Promise.all([
+                railwayAPI.getBrandingData(),
+                railwayAPI.getMileageData()
+            ]);
+            allBranding = branding || [];
+            allMileage = mileage || [];
+        } catch (e) {
+            railwayAPI.showMessage(`Error loading data: ${e.message}`, 'error');
+            allBranding = allBranding || [];
+            allMileage = allMileage || [];
         }
+    }
+    // helpers for KM
+    function totalKmForTrain(trainId){
+        let km = Number.POSITIVE_INFINITY;
+        let seen = false;
+        const target = normalizeTrainId(trainId);
+        for (const row of allMileage){
+            if (normalizeTrainId(row.Train_ID) === target){
+                const v = (row.Total_KM||'').toString().replace(/[^0-9.]/g,'');
+                const n = parseFloat(v);
+                if (!isNaN(n)){ km = n; seen = true; }
+            }
+        }
+        return seen ? km : Number.POSITIVE_INFINITY;
+    }
+
+    function computeAvailableTrains() {
+        // A train is available if ANY branding row for that Train_ID has Remaining_Hours == 0
+        const availableSet = new Set();
+        for (const row of (allBranding||[])){
+            const t = normalizeTrainId(row.Train_ID); if (!t) continue;
+            const remaining = parseNumberSafe(row.Remaining_Hours, 0);
+            if (remaining === 0){ availableSet.add(t); }
+        }
+        availableTrainIds = Array.from(availableSet);
+        // Sort by minimal Total_KM for suggestion ordering
+        availableTrainIds.sort((a,b)=> totalKmForTrain(a) - totalKmForTrain(b));
+
+        const banner = document.getElementById('availableBanner');
+        if (banner) banner.textContent = `${availableTrainIds.length} trains available for new campaigns`;
+        const countSel = document.getElementById('newTrainCount');
+        countSel.innerHTML = '';
+        const max = Math.max(0, availableTrainIds.length);
+        for (let i=0;i<=max;i++){ const opt=document.createElement('option'); opt.value=String(i); opt.textContent=String(i); countSel.appendChild(opt);} 
+        countSel.value = Math.min(4, max).toString();
+        // reset selected to top-N by default (suggestions), preserving any still-valid matches
+        selectedTrains = selectedTrains.filter(t => availableTrainIds.includes(normalizeTrainId(t))).map(normalizeTrainId);
+        const desired = parseIntSafe(countSel.value, 0);
+        while (selectedTrains.length < desired){ selectedTrains.push(''); }
+        renderTrainSelectors();
+    }
+
+    function getNextCampaignId() {
+        // Increment from the last existing ID (by highest Record_ID), preserving prefix and numeric width
+        if (!allBranding || allBranding.length === 0) return 'CAMP001';
+        let lastRow = null; let maxRid = -1;
+        for (const row of allBranding) {
+            const rid = parseIntSafe(row.Record_ID, -1);
+            if (rid > maxRid) { maxRid = rid; lastRow = row; }
+        }
+        if (!lastRow) lastRow = allBranding[allBranding.length - 1];
+        const lastId = (lastRow.Campaign_ID || '').toString();
+        const m = lastId.match(/^(\D*)(\d+)$/);
+        if (m) {
+            const prefix = m[1] || 'CAMP';
+            const numPart = m[2];
+            const nextNum = parseInt(numPart, 10) + 1;
+            const padded = String(nextNum).padStart(numPart.length, '0');
+            return `${prefix}${padded}`;
+        }
+        // Fallback: detect max across all
+        let maxNum = 0; let prefix = 'CAMP'; let width = 3;
+        for (const row of allBranding) {
+            const cid = (row.Campaign_ID || '').toString();
+            const mm = cid.match(/^(\D*)(\d+)$/);
+            if (mm) {
+                const num = parseInt(mm[2], 10);
+                if (num > maxNum) { maxNum = num; prefix = mm[1] || 'CAMP'; width = mm[2].length; }
+            }
+        }
+        return `${prefix}${String(maxNum + 1).padStart(width, '0')}`;
+    }
+    function getNextRecordIdStart() { let maxId=0; for(const row of allBranding){ const rid=parseIntSafe(row.Record_ID,0); if(rid>maxId) maxId=rid;} return maxId+1; }
+
+    function renderTrainSelectors() {
+        const container = document.getElementById('newTrainSelectors');
+        const count = parseIntSafe(document.getElementById('newTrainCount').value, 0);
+        // Resize selection state to count
+        if (selectedTrains.length > count) selectedTrains = selectedTrains.slice(0, count);
+        while (selectedTrains.length < count) selectedTrains.push('');
+
+        container.innerHTML = '';
+        const used = new Set();
+        for (let i=0;i<count;i++){
+            const currentSelected = selectedTrains[i];
+            // Determine effective selected (prefer current if valid, otherwise suggest by KM order)
+            let effective = (currentSelected && availableTrainIds.includes(currentSelected) && !used.has(currentSelected)) ? currentSelected : '';
+            // Build options excluding already used (except effective)
+            const options = availableTrainIds.filter(t => !used.has(t) || t === effective);
+            if (!effective) effective = options[0] || '';
+            // Commit to state and used set
+            selectedTrains[i] = effective;
+            if (effective) used.add(effective);
+
+            // Render field
+            const wrap = document.createElement('div'); wrap.className='form-group';
+            const lab = document.createElement('label'); lab.textContent = `Train ${i+1}`;
+            const sel = document.createElement('select'); sel.dataset.index=String(i);
+            for (const t of options){ const opt=document.createElement('option'); opt.value=t; opt.textContent=t; if (t===effective) opt.selected=true; sel.appendChild(opt);} 
+            sel.addEventListener('change', (e)=>{ const idx=parseInt(e.target.dataset.index,10); selectedTrains[idx]=e.target.value; renderTrainSelectors(); });
+            wrap.appendChild(lab); wrap.appendChild(sel); container.appendChild(wrap);
+        }
+    }
+
+    async function initAddCampaignPanel(){
+        document.getElementById('newCampaignId').value = getNextCampaignId();
+        computeAvailableTrains();
+    }
+    function collectTrainSelections(){ return Array.from(document.querySelectorAll('#newTrainSelectors select')).map(s=>s.value).filter(Boolean); }
+
+    async function saveCampaign(){
+        try{
+            const campaignId = document.getElementById('newCampaignId').value.trim();
+            const name = document.getElementById('newCampaignName').value.trim();
+            const start = document.getElementById('newStartDate').value;
+            const end = document.getElementById('newEndDate').value;
+            const reqHrs = parseIntSafe(document.getElementById('newRequiredHours').value, 0);
+            const penalty = parseIntSafe(document.getElementById('newPenaltyPerDay').value, 0);
+            const trains = collectTrainSelections();
+            if (!campaignId || !name || !start || !end) throw new Error('Please fill all required fields');
+            if (trains.length === 0) throw new Error('Select at least one train');
+            let recordId = getNextRecordIdStart();
+            for (const t of trains){
+                const row={ Record_ID:String(recordId++), Campaign_ID:campaignId, Train_ID:t, Campaign_Name:name, Start_Date: railwayAPI.formatDateForSheets(start), End_Date: railwayAPI.formatDateForSheets(end), Required_Exposure_Hours:String(reqHrs), Accumulated_Exposure_Hours:'0', Penalty_Per_Day:String(penalty), Remaining_Hours:String(reqHrs) };
+                await railwayAPI.saveBrandingData(row);
+            }
+            railwayAPI.showMessage(`Campaign ${campaignId} created for ${trains.length} train(s).`);
+            await loadData();
+            // Reset form and re-init panel for next campaign
+            document.getElementById('addCampaignForm').reset();
+            await initAddCampaignPanel();
+        }catch(e){ railwayAPI.showMessage(e.message,'error'); }
+    }
+
+    // Init on load
+    async function init(){
+        await loadData();
+        await initAddCampaignPanel();
+    }
+
+    // Wire up forms
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('addCampaignForm').addEventListener('submit', (e)=>{ e.preventDefault(); saveCampaign(); });
+        document.getElementById('newTrainCount').addEventListener('change', ()=>{ renderTrainSelectors(); });
+        init();
     });
 </script>
-
-<!-- Include the Railway API -->
-<script src="railway-api.js"></script>
 
 </body>
 </html>

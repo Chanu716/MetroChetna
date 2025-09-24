@@ -1,30 +1,20 @@
-<!DOCTYP        /* Dynamic Section Styles */
-        .form-section {
-            display: none;
-            background: transparent;
-            margin-top: 30px;
-            padding: 20px 0;
-            animation: slideDown 0.3s ease-in-out;
-        }tml lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Card Management</title>
+    <title>Open New Card</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Dynamic Section Styles */
+        /* Section Styles (always visible) */
         .form-section {
-            display: none;
-            background: rgba(248, 249, 250, 0.8);
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
             margin-top: 30px;
             padding: 30px 40px;
             border-radius: 8px;
-            border: 1px solid rgba(233, 236, 239, 0.5);
+            border: 2px solid #e9ecef;
+            box-shadow: 0 4px 16px rgba(92, 107, 192, 0.1);
             animation: slideDown 0.3s ease-in-out;
-        }
-        
-        .form-section.active {
-            display: block;
         }
         
         @keyframes slideDown {
@@ -36,27 +26,6 @@
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
-        
-        .section-header {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 20px;
-        }
-        
-        .close-section {
-            color: #6c757d;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 1;
-            padding: 5px;
-            margin-right: 10px;
-            transition: color 0.3s ease;
-        }
-        
-        .close-section:hover {
-            color: #5c6bc0;
         }
         
         /* Center single button */
@@ -83,56 +52,14 @@
         textarea:focus {
             border-color: #5c6bc0;
             outline: none;
+            box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.1);
         }
         
         textarea::placeholder {
             color: #6c757d;
         }
         
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-top: 40px;
-        }
-        
-        .action-card {
-            background: transparent;
-            padding: 40px 20px;
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid #5c6bc0;
-        }
-        
-        .action-card:hover {
-            background: linear-gradient(135deg, #5c6bc0 0%, #7986cb 100%);
-            border-color: #3f51b5;
-            transform: translateY(-4px);
-        }
-        
-        .action-card h3 {
-            margin-bottom: 15px;
-            color: #1a237e;
-            font-size: 1.3em;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-        
-        .action-card:hover h3 {
-            color: #ffffff;
-        }
-        
-        .action-card p {
-            color: #6c757d;
-            margin: 0;
-            transition: color 0.3s ease;
-        }
-        
-        .action-card:hover p {
-            color: #ffffff;
-        }
+        /* Remove action cards in this simplified page */
     </style>
 </head>
 <body>
@@ -140,24 +67,11 @@
 <div class="container">
     <div class="page-header">
         <button class="back-btn" onclick="window.location.href='dashboard.html'">←</button>
-        <h1>Job Card Management</h1>
-    </div>
-    
-    <div class="action-buttons">
-        <div class="action-card" onclick="showOpenNewCard()">
-            <h3>Open New Card</h3>
-        </div>
-        
-        <div class="action-card" onclick="showCloseExistingCard()">
-            <h3>Close Existing Card</h3>
-        </div>
+        <h1>Open New Job Card</h1>
     </div>
 
     <!-- Open New Card Section -->
     <div id="openCardSection" class="form-section">
-        <div class="section-header">
-            <span class="close-section" onclick="hideSection('openCardSection')">&times;</span>
-        </div>
         <form id="openCardForm">
             <div class="form-group">
                 <label for="newJobCardID">Job Card ID</label>
@@ -185,128 +99,46 @@
         </form>
     </div>
 
-    <!-- Close Existing Card Section -->
-    <div id="closeCardSection" class="form-section">
-        <div class="section-header">
-            <span class="close-section" onclick="hideSection('closeCardSection')">&times;</span>
-        </div>
-        
-        <form id="closeCardForm">
-            <div class="form-group">
-                <label for="existingJobCardID">Job Card ID</label>
-                <select id="existingJobCardID" name="existingJobCardID" required>
-                    <option value="" disabled selected>Select an open job card...</option>
-                </select>
-            </div>
-            
-            <div id="jobCardDetails" style="display: none;">
-                <div class="form-group">
-                    <label for="displayTrainID">Train ID</label>
-                    <input type="text" id="displayTrainID" name="displayTrainID" readonly>
-                </div>
-                
-                <div class="form-group">
-                    <label for="displayOpenDate">Opened Date</label>
-                    <input type="text" id="displayOpenDate" name="displayOpenDate" readonly>
-                </div>
-                
-                <div class="form-group">
-                    <label for="displayTaskDescription">Job Description</label>
-                    <textarea id="displayTaskDescription" name="displayTaskDescription" readonly></textarea>
-                </div>
-                
-                <div class="button-container">
-                    <button type="submit" class="submit-btn">Close Job Card</button>
-                </div>
-            </div>
-        </form>
+    
     </div>
-</div>
-</div>
+  </div>
 
 <script>
-    let openJobCards = []; // Will be loaded from Google Sheets
-    let lastJobCardID = 3109; // Will be fetched from Google Sheets
+    let lastJobCardID = 3100; // Will be fetched from Google Sheets
 
-    // Section functions
-    function showSection(sectionId) {
-        // Hide all sections first
-        document.querySelectorAll('.form-section').forEach(section => {
-            section.classList.remove('active');
-        });
-        // Show the selected section
-        document.getElementById(sectionId).classList.add('active');
-    }
-
-    function hideSection(sectionId) {
-        document.getElementById(sectionId).classList.remove('active');
-        
-        // Reset forms when hiding
-        if (sectionId === 'openCardSection') {
-            document.getElementById('openCardForm').reset();
-        } else if (sectionId === 'closeCardSection') {
-            document.getElementById('closeCardForm').reset();
-            document.getElementById('jobCardDetails').style.display = 'none';
-        }
-    }
-
-    async function showOpenNewCard() {
+    async function initOpenJobCard() {
         try {
-            // Get the latest job card ID from Google Sheets
-            const existingCards = await railwayAPI.getJobCardData();
-            if (existingCards && existingCards.length > 0) {
-                const lastCard = existingCards[existingCards.length - 1];
-                const lastIdNum = parseInt(lastCard.JobCard_ID.replace('JC', ''));
-                lastJobCardID = lastIdNum;
+            // Check server availability first
+            if (!railwayAPI.isServerAvailable) {
+                await railwayAPI.checkServerConnection();
             }
-
-            // Set auto-incremented ID and today's date
+            
+            if (railwayAPI.isServerAvailable) {
+                const existingCards = await railwayAPI.getJobCardData();
+                if (existingCards && existingCards.length > 0) {
+                    // Find max numeric JC id to avoid ordering issues
+                    const maxNum = existingCards.reduce((max, c) => {
+                        const n = parseInt((c.JobCard_ID||'').toString().replace(/[^0-9]/g,''), 10);
+                        return isNaN(n) ? max : Math.max(max, n);
+                    }, 0);
+                    lastJobCardID = maxNum;
+                }
+            } else {
+                // Server not available, use fallback
+                console.warn('Server not available, using fallback job card ID');
+                railwayAPI.showMessage('Server not available. Job cards will use fallback numbering.', 'error');
+            }
+            
             document.getElementById('newJobCardID').value = `JC${lastJobCardID + 1}`;
             document.getElementById('openDate').value = new Date().toISOString().split('T')[0];
-            
-            showSection('openCardSection');
-            scrollToSection('openCardSection');
         } catch (error) {
+            console.error('Error in initOpenJobCard:', error);
             railwayAPI.showMessage(`Error loading job card data: ${error.message}`, 'error');
+            // Still set defaults even if there's an error
+            document.getElementById('newJobCardID').value = `JC${lastJobCardID + 1}`;
+            document.getElementById('openDate').value = new Date().toISOString().split('T')[0];
         }
     }
-
-    async function showCloseExistingCard() {
-        try {
-            // Load open job cards from Google Sheets
-            const jobCards = await railwayAPI.getJobCardData();
-            openJobCards = jobCards.filter(card => card.Status === 'Open');
-            
-            // Populate dropdown with open job cards
-            const select = document.getElementById('existingJobCardID');
-            select.innerHTML = '<option value="" disabled selected>Select an open job card...</option>';
-            
-            openJobCards.forEach(card => {
-                const option = document.createElement('option');
-                option.value = card.JobCard_ID;
-                option.textContent = `${card.JobCard_ID} - ${card.Task_Description.substring(0, 50)}...`;
-                select.appendChild(option);
-            });
-            
-            showSection('closeCardSection');
-            scrollToSection('closeCardSection');
-        } catch (error) {
-            railwayAPI.showMessage(`Error loading open job cards: ${error.message}`, 'error');
-        }
-    }
-
-    // Handle job card selection for closing
-    document.getElementById('existingJobCardID').addEventListener('change', function() {
-        const selectedId = this.value;
-        const selectedCard = openJobCards.find(card => card.JobCard_ID === selectedId);
-        
-        if (selectedCard) {
-            document.getElementById('displayTrainID').value = selectedCard.Train_ID || 'Not specified';
-            document.getElementById('displayOpenDate').value = selectedCard.Opened_Date;
-            document.getElementById('displayTaskDescription').value = selectedCard.Task_Description;
-            document.getElementById('jobCardDetails').style.display = 'block';
-        }
-    });
 
     // Handle opening new job card
     document.getElementById('openCardForm').addEventListener('submit', async function(e) {
@@ -316,58 +148,24 @@
             JobCard_ID: document.getElementById('newJobCardID').value,
             Train_ID: document.getElementById('newTrainID').value,
             Task_Description: document.getElementById('newTaskDescription').value,
-            Opened_Date: document.getElementById('openDate').value,
+            Opened_Date: railwayAPI.formatDateForSheets(document.getElementById('openDate').value),
             Status: 'Open',
-            Closed_Date: ''
+            Closed_Date: 'NULL'
         };
         
         try {
             await railwayAPI.saveJobCardData(jobCardData);
             railwayAPI.showMessage('Job card opened successfully!');
-            hideSection('openCardSection');
+            // Reset form and prepare next auto ID
+            document.getElementById('openCardForm').reset();
+            await initOpenJobCard();
             
         } catch (error) {
             railwayAPI.showMessage(`Error opening job card: ${error.message}`, 'error');
         }
     });
-
-    // Handle closing existing job card
-    document.getElementById('closeCardForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const result = confirm('Are you sure you want to close this job card?');
-        if (!result) return;
-        
-        const selectedId = document.getElementById('existingJobCardID').value;
-        const selectedCard = openJobCards.find(card => card.JobCard_ID === selectedId);
-        
-        if (selectedCard) {
-            const updatedJobCardData = {
-                ...selectedCard,
-                Status: 'Closed',
-                Closed_Date: new Date().toISOString().split('T')[0]
-            };
-            
-            try {
-                await railwayAPI.updateJobCardData(selectedId, updatedJobCardData);
-                railwayAPI.showMessage('Job card closed successfully!');
-                hideSection('closeCardSection');
-                
-            } catch (error) {
-                railwayAPI.showMessage(`Error closing job card: ${error.message}`, 'error');
-            }
-        }
-    });
-
-    // Scroll to section when opened
-    function scrollToSection(sectionId) {
-        setTimeout(() => {
-            document.getElementById(sectionId).scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start' 
-            });
-        }, 100);
-    }
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', initOpenJobCard);
 </script>
 
 <!-- Include the Railway API -->

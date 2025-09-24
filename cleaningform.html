@@ -3,48 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cleaning & Detailing</title>
+    <title>Add Cleaning Slots</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 24h text time inputs styling */
+        .time-input {
+            font-family: monospace;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
     <div class="page-header">
         <button class="back-btn" onclick="window.location.href='dashboard.html'">←</button>
-        <h1>Confirm Cleaning & Detailing</h1>
+        <h1>Add Cleaning Slots</h1>
     </div>
-    <form id="cleaningForm">
+    <form id="slotForm">
         <div class="form-group">
-            <label for="trainID">Train ID</label>
-            <select id="trainID" name="trainID">
-                <option value="" disabled selected>Select a Train ID</option>
-                <option value="T001">T001</option><option value="T002">T002</option><option value="T003">T003</option><option value="T004">T004</option><option value="T005">T005</option><option value="T006">T006</option><option value="T007">T007</option><option value="T008">T008</option><option value="T009">T009</option><option value="T010">T010</option><option value="T011">T011</option><option value="T012">T012</option><option value="T013">T013</option><option value="T014">T014</option><option value="T015">T015</option><option value="T016">T016</option><option value="T017">T017</option><option value="T018">T018</option><option value="T019">T019</option><option value="T020">T020</option><option value="T021">T021</option><option value="T022">T022</option><option value="T023">T023</option><option value="T024">T024</option><option value="T025">T025</option>
-            </select>
+            <label for="slotDate">Date</label>
+            <input type="date" id="slotDate" name="slotDate" required>
         </div>
         <div class="form-group">
-            <label for="date">Date</label>
-            <input type="date" id="date" name="date" required>
+            <label for="startTime">Start Time (24-hour format, e.g., 23:00)</label>
+            <input type="text" id="startTime" name="startTime" class="time-input" inputmode="numeric" pattern="^([01]\d|2[0-3]):[0-5]\d$" required placeholder="HH:MM">
         </div>
         <div class="form-group">
-            <label for="slot">Cleaning Slot</label>
-            <select id="slot" name="slot">
-                <option value="Slot 1 (21:00 - 23:00)">Slot 1 (21:00 - 23:00)</option>
-                <option value="Slot 2 (23:00 - 01:00)">Slot 2 (23:00 - 01:00)</option>
-                <option value="Slot 3 (01:00 - 03:00)">Slot 3 (01:00 - 03:00)</option>
-            </select>
+            <label for="endTime">End Time (24-hour format, e.g., 23:30)</label>
+            <input type="text" id="endTime" name="endTime" class="time-input" inputmode="numeric" pattern="^([01]\d|2[0-3]):[0-5]\d$" required placeholder="HH:MM">
         </div>
         <div class="button-container">
-            <button type="submit" class="submit-btn">Confirm Slot</button>
+            <button type="submit" class="submit-btn">Save Slots</button>
         </div>
     </form>
 </div>
 
+<!-- Include API -->
+<script src="railway-api.js"></script>
 <script>
-    const form = document.getElementById('cleaningForm');
-    form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        alert(`Cleaning slot for ${document.getElementById('trainID').value} on ${document.getElementById('date').value} confirmed.`);
+    function toMinutes(hhmm){ const [h,m] = hhmm.split(':').map(Number); return h*60 + (m||0); }
+    function pad2(n){ return String(n).padStart(2,'0'); }
+    function fromMinutes(min){ const h=Math.floor(min/60)%24; const m=min%60; return `${pad2(h)}:${pad2(m)}`; }
+
+    // Global normalizer to ensure any input becomes HH:mm in 24h
+    function normalizeTimeString(value){
+        let v = (value || '').trim().toLowerCase();
+        if (!v) return '';
+        v = v.replace(/\s+/g,'');
+        const isPM = /pm$/.test(v);
+        const isAM = /am$/.test(v);
+        v = v.replace(/am|pm/g,'');
+
+        // Only hours: "13" -> "13:00"
+        if (/^\d{1,2}$/.test(v)){
+            let h = parseInt(v,10);
+            if (isPM && h < 12) h += 12;
+            if (isAM && h === 12) h = 0;
+            h = Math.max(0, Math.min(23, h));
+            return `${pad2(h)}:00`;
+        }
+
+        // Compact digits like 1300 -> 13:00
+        const four = v.match(/^(\d{3,4})$/);
+        if (four){
+            const str = four[1].padStart(4,'0');
+            let h = parseInt(str.slice(0, str.length-2),10);
+            let min = parseInt(str.slice(-2),10);
+            if (isPM && h < 12) h += 12;
+            if (isAM && h === 12) h = 0;
+            h = Math.max(0, Math.min(23, h));
+            min = Math.max(0, Math.min(59, isNaN(min) ? 0 : min));
+            return `${pad2(h)}:${pad2(min)}`;
+        }
+
+        // Patterns like 13:0, 1:05, 1:5 -> HH:mm
+        const m = v.match(/^(\d{1,2})(?::?(\d{1,2}))?$/);
+        if (m){
+            let h = parseInt(m[1],10);
+            let min = m[2] !== undefined ? parseInt(m[2],10) : 0;
+            if (isPM && h < 12) h += 12;
+            if (isAM && h === 12) h = 0;
+            h = Math.max(0, Math.min(23, h));
+            min = Math.max(0, Math.min(59, isNaN(min) ? 0 : min));
+            return `${pad2(h)}:${pad2(min)}`;
+        }
+        return v; // fallback, may fail validation
+    }
+    
+    // Set placeholder examples and ensure 24-hour format
+    document.addEventListener('DOMContentLoaded', function() {
+        const startTime = document.getElementById('startTime');
+        const endTime = document.getElementById('endTime');
+        
+    // Set default values as examples (can be changed by user)
+    startTime.value = '10:00';
+    endTime.value = '11:00';
+        
+        // Normalize input to 24-hour HH:mm even if user types just hours, digits, or AM/PM
+        function normalizeTimeInput(el){ el.value = normalizeTimeString(el.value); }
+
+        // Add input event listeners to validate 24-hour format
+        [startTime, endTime].forEach(input => {
+            function validate(el){
+                const value = el.value;
+                if (!value) { el.setCustomValidity(''); return; }
+                const ok = /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+                el.setCustomValidity(ok ? '' : 'Please enter time in 24-hour format (HH:MM)');
+            }
+            input.addEventListener('input', function(){ normalizeTimeInput(this); validate(this); });
+            input.addEventListener('blur', function(){ normalizeTimeInput(this); validate(this); });
+            input.addEventListener('change', function(){ normalizeTimeInput(this); validate(this); });
+        });
     });
+
+    async function saveSlots(e){
+        e.preventDefault();
+        const date = document.getElementById('slotDate').value; // YYYY-MM-DD
+        const startEl = document.getElementById('startTime');
+        const endEl = document.getElementById('endTime');
+        // Normalize right before submit to avoid pattern errors
+        startEl.value = normalizeTimeString(startEl.value);
+        endEl.value = normalizeTimeString(endEl.value);
+        const start = startEl.value; // HH:MM
+        const end = endEl.value; // HH:MM
+        if (!date || !start || !end){ railwayAPI.showMessage('Please fill all fields','error'); return; }
+        // Validate with strict 24h pattern
+        const re = /^([01]\d|2[0-3]):[0-5]\d$/;
+        if (!re.test(start) || !re.test(end)){
+            railwayAPI.showMessage('Please enter time in 24-hour format HH:MM (00:00 - 23:59)','error');
+            return;
+        }
+
+        let s = toMinutes(start);
+        let eMin = toMinutes(end);
+        // Round end down to previous 10-minute boundary
+        eMin = Math.floor(eMin / 10) * 10;
+        if (eMin <= s){ railwayAPI.showMessage('End time must be after start time','error'); return; }
+
+        // Expand into 10-minute slots
+        const rows = [];
+        for (let t=s; t+10<=eMin; t+=10){
+            const slotStart = fromMinutes(t);
+            const slotEnd = fromMinutes(t+10);
+            rows.push({
+                Date: railwayAPI.formatDateForSheets(date),
+                Start_Time: slotStart,
+                End_Time: slotEnd,
+                Status: 'Available'
+            });
+        }
+        if (rows.length === 0){ railwayAPI.showMessage('No 10-minute slots in the given range','error'); return; }
+
+        try{
+            // Save sequentially to avoid quota spikes (or could be batched later)
+            for (const r of rows){ await railwayAPI.saveCleaningSlotsData(r); }
+            railwayAPI.showMessage(`${rows.length} slot(s) created as Available`);
+            document.getElementById('slotForm').reset();
+        }catch(err){
+            railwayAPI.showMessage(`Error saving slots: ${err.message}`,'error');
+        }
+    }
+
+    document.getElementById('slotForm').addEventListener('submit', saveSlots);
 </script>
 
 </body>

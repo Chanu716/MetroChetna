@@ -97,6 +97,53 @@ typings/
 ehthumbs.db
 Thumbs.db
 
+# Windows/macOS artifact folders
+__MACOSX/
+Desktop.ini
+
+# Archives and large binaries not needed in VCS
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+*.ppt
+*.pptx
+*.key
+*.mp4
+*.mov
+*.avi
+*.mkv
+
+# Local environment and secrets
+.env*
+*.env.local
+*.local
+
+# Logs and temp
+logs/
+*.log
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Editors/IDE
+.idea/
+.fleet/
+.history/
+.vscode/
+
+# Service account credentials (security)
+*service-account*.json
+*credentials*.json
+valiant-store-441008-q0-5711f1e44b63.json
+
 # Logs
 logs
 *.log
@@ -105,59 +152,3 @@ logs
 *service-account*.json
 *credentials*.json
 valiant-store-441008-q0-5711f1e44b63.json
-
-# Project specific files
-# Backup files
-*.bak
-*.backup
-*-old.*
-*-backup.*
-
-# Test files
-test-*.html
-*-test.*
-
-# Documentation files (optional - remove if you want to keep them)
-*-SETUP.md
-*-COMPLETE.md
-TROUBLESHOOTING.md
-INTEGRATION-*.md
-
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-
-# Cache files
-.cache/
-*.tmp
-*.temp
-
-# IDE files
-*.swp
-*.swo
-*~
-
-# Windows specific
-desktop.ini
-$RECYCLE.BIN/
-
-# PowerShell execution policy files
-*.ps1xml
-
-# Compressed files
-*.zip
-*.rar
-*.7z
-*.tar.gz
-
-# Media files (if not needed in repo)
-*.mp4
-*.avi
-*.mov
-*.wmv
-*.flv
-
-# Large files
-*.iso
-*.dmg
