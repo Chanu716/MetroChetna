@@ -751,7 +751,11 @@ if (!process.env.NETLIFY && !process.env.VERCEL) {
     console.log(`🌐 Open your app at: http://localhost:${PORT}`);
     console.log(`🧪 Test page at: http://localhost:${PORT}/test.html`);
     console.log(`📊 API test at: http://localhost:${PORT}/api/stats`);
-    console.log('📧 Make sure your Google Sheet is shared with: chanikya@valiant-store-441008-q0.iam.gserviceaccount.com');
+    if (process.env.GOOGLE_CLIENT_EMAIL) {
+      console.log(`📧 Make sure your Google Sheet is shared with: ${process.env.GOOGLE_CLIENT_EMAIL}`);
+    } else {
+      console.log('📧 Make sure your Google Sheet is shared with your service account email');
+    }
   });
 }
 

@@ -3,6 +3,10 @@
   publish = "."
   functions = "netlify/functions"
 
+# Environment variables
+[build.environment]
+  SECRETS_SCAN_OMIT_PATHS = "valiant-store-*.json"
+
 # Proxy API requests to Netlify Function
 [[redirects]]
   from = "/api/*"
