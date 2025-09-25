@@ -97,53 +97,6 @@ typings/
 ehthumbs.db
 Thumbs.db
 
-# Windows/macOS artifact folders
-__MACOSX/
-Desktop.ini
-
-# Archives and large binaries not needed in VCS
-*.zip
-*.tar
-*.tar.gz
-*.rar
-*.7z
-*.ppt
-*.pptx
-*.key
-*.mp4
-*.mov
-*.avi
-*.mkv
-
-# Local environment and secrets
-.env*
-*.env.local
-*.local
-
-# Logs and temp
-logs/
-*.log
-*.tmp
-*.temp
-tmp/
-temp/
-
-# Lock files
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-
-# Editors/IDE
-.idea/
-.fleet/
-.history/
-.vscode/
-
-# Service account credentials (security)
-*service-account*.json
-*credentials*.json
-valiant-store-441008-q0-5711f1e44b63.json
-
 # Logs
 logs
 *.log

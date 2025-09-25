@@ -26,13 +26,26 @@ app.use(express.static('./', {
 }));
 
 // Initialize Google Sheets API with Service Account
-const auth = new GoogleAuth({
-  keyFile: './valiant-store-441008-q0-5711f1e44b63.json', // Path to your JSON file
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-});
+// Use environment variables if provided (Netlify/Vercel), otherwise fall back to keyFile
+const SPREADSHEET_ID = process.env.SPREADSHEET_ID || '1kDzB4jwvJYpwmY-O4mtrCo1CM7_Ok-cLtPAghWrGBwQ';
+let auth;
+if (process.env.GOOGLE_CLIENT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
+  const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
+  auth = new google.auth.JWT(
+    process.env.GOOGLE_CLIENT_EMAIL,
+    undefined,
+    privateKey,
+    ['https://www.googleapis.com/auth/spreadsheets']
+  );
+} else {
+  auth = new GoogleAuth({
+    keyFile: './valiant-store-441008-q0-5711f1e44b63.json',
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  });
+}
 
 const sheets = google.sheets({ version: 'v4', auth });
-const SPREADSHEET_ID = '1kDzB4jwvJYpwmY-O4mtrCo1CM7_Ok-cLtPAghWrGBwQ'; // Your actual spreadsheet ID
+// Spreadsheet ID is taken from env or defaults above
 
 // Simple in-memory cache for sheet reads
 const _cache = new Map(); // key: range -> { at: epochMs, ttl: ms, values }
@@ -730,14 +743,17 @@ app.post('/api/approve', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`🌐 Open your app at: http://localhost:${PORT}`);
-  console.log(`🧪 Test page at: http://localhost:${PORT}/test.html`);
-  console.log(`📊 API test at: http://localhost:${PORT}/api/stats`);
-  console.log('📧 Make sure your Google Sheet is shared with: chanikya@valiant-store-441008-q0.iam.gserviceaccount.com');
-});
+// Only listen in non-serverless environments
+if (!process.env.NETLIFY && !process.env.VERCEL) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`🌐 Open your app at: http://localhost:${PORT}`);
+    console.log(`🧪 Test page at: http://localhost:${PORT}/test.html`);
+    console.log(`📊 API test at: http://localhost:${PORT}/api/stats`);
+    console.log('📧 Make sure your Google Sheet is shared with: chanikya@valiant-store-441008-q0.iam.gserviceaccount.com');
+  });
+}
 
 // Serve dashboard as default page
 app.get('/', (req, res) => {
