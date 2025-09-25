@@ -5,7 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Scheduling Proposals Runner</title>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 20px; }
+    body { 
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; 
+      margin: 0;
+      padding-top: 140px;
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-bottom: 20px;
+    }
+    .global-header {
+      background-color: #003366;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 30px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .global-header img {
+      height: 100px;
+      width: auto;
+    }
+    .global-header h2 {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 2em;
+      margin: 0;
+      font-weight: 600;
+      text-align: center;
+      font-family: 'IBM Plex Sans', sans-serif;
+    }
     button { padding: 8px 14px; border-radius: 6px; border: 1px solid #ccc; cursor: pointer; }
     .row { margin: 12px 0; }
     pre { background: #f7f7f8; padding: 12px; border-radius: 8px; max-height: 50vh; overflow: auto; }
@@ -14,6 +49,13 @@
   </style>
 </head>
 <body>
+
+<div class="global-header">
+    <img src="https://vectorseek.com/wp-content/uploads/2023/09/Kerala-Government-Logo-Vector.svg-.png" alt="Kerala Government Emblem">
+    <h2>Kochi Metro Rail Limited</h2>
+    <img src="https://www.betterbuys.com/wp-content/uploads/2018/09/IBM.png" alt="IBM Logo">
+</div>
+
   <h1>Scheduling Proposals</h1>
   <div class="row">
     <button id="run">Run Algorithm</button>
