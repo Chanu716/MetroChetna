@@ -30,7 +30,24 @@ app.use(express.static('./', {
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID || '1kDzB4jwvJYpwmY-O4mtrCo1CM7_Ok-cLtPAghWrGBwQ';
 let auth;
 if (process.env.GOOGLE_CLIENT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
+  let privateKey = process.env.GOOGLE_PRIVATE_KEY;
+  
+  // Handle Base64 encoded key (if GOOGLE_PRIVATE_KEY_BASE64 is set)
+  if (process.env.GOOGLE_PRIVATE_KEY_BASE64) {
+    privateKey = Buffer.from(process.env.GOOGLE_PRIVATE_KEY_BASE64, 'base64').toString('utf-8');
+  } 
+  // Handle escaped newlines
+  else if (privateKey.includes('\\n')) {
+    privateKey = privateKey.replace(/\\n/g, '\n');
+  }
+  // If it doesn't have proper line breaks, try to add them
+  else if (!privateKey.includes('\n') && privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
+    // Key is on one line without proper breaks, this shouldn't happen but handle it
+    privateKey = privateKey.replace(/-----BEGIN PRIVATE KEY-----/g, '-----BEGIN PRIVATE KEY-----\n')
+                           .replace(/-----END PRIVATE KEY-----/g, '\n-----END PRIVATE KEY-----')
+                           .replace(/(.{64})/g, '$1\n');
+  }
+  
   auth = new google.auth.JWT(
     process.env.GOOGLE_CLIENT_EMAIL,
     undefined,
