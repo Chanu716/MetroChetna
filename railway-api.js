@@ -19,14 +19,15 @@ class RailwayMaximoAPI {
     // Check if server is running
     async checkServerConnection() {
         try {
-            // Try to fetch from the stats endpoint to verify API is working
-            const response = await fetch(`${this.serverURL}/stats`, {
+            // Try to fetch from the health endpoint to verify API is working
+            const response = await fetch(`${this.serverURL}/health`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
             if (response.ok) {
+                const data = await response.json();
                 this.isServerAvailable = true;
-                console.log('✅ Server connection established');
+                console.log('✅ Server connection established:', data.message);
                 return true;
             } else {
                 this.isServerAvailable = false;

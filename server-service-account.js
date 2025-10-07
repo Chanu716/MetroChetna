@@ -773,4 +773,14 @@ app.get('/test', (req, res) => {
   });
 });
 
+// Health check endpoint for Netlify (under /api path)
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    message: 'API is working!', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NETLIFY ? 'production' : 'development'
+  });
+});
+
 module.exports = app;
