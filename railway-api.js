@@ -3,7 +3,9 @@
 
 class RailwayMaximoAPI {
     constructor() {
-        this.serverURL = 'http://localhost:3000/api';
+        // Detect environment: use /api for production (Netlify), localhost for development
+        const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        this.serverURL = isProduction ? '/api' : 'http://localhost:3000/api';
         this.isServerAvailable = false;
         // Internal watchers state
     this._logsWatcher = null; // { timer, lastCount, intervalMs, onNew }
@@ -17,19 +19,35 @@ class RailwayMaximoAPI {
     // Check if server is running
     async checkServerConnection() {
         try {
-            const response = await fetch(`${this.serverURL.replace('/api', '')}/test`);
+            // Try to fetch from the stats endpoint to verify API is working
+            const response = await fetch(`${this.serverURL}/stats`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
             if (response.ok) {
                 this.isServerAvailable = true;
                 console.log('✅ Server connection established');
+                return true;
+            } else {
+                this.isServerAvailable = false;
+                console.warn('⚠️ Server responded but not OK:', response.status);
+                return false;
             }
         } catch (error) {
             this.isServerAvailable = false;
-            console.warn('⚠️ Server not available. Make sure to run: npm start');
+            console.warn('⚠️ Server not available:', error.message);
+            return false;
         }
     }
 
     // Get data from Google Sheets
     async getData(sheetName) {
+        // Try to check connection if not already established
+        if (!this.isServerAvailable) {
+            await this.checkServerConnection();
+        }
+        
+        // If still not available after check, throw error
         if (!this.isServerAvailable) {
             throw new Error('Server not available. Please start the server with: npm start');
         }
